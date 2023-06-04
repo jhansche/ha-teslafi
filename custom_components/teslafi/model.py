@@ -6,7 +6,7 @@ from collections import UserDict
 NAN: float = float("NaN")
 
 
-from .const import VIN_YEARS
+from .const import LOGGER, VIN_YEARS
 class TeslaFiVehicle(UserDict):
     """TeslaFi Vehicle Data"""
 
@@ -61,3 +61,17 @@ class TeslaFiVehicle(UserDict):
             return None
         dig = self.vin[9]
         return VIN_YEARS.get(dig, None)
+
+    @property
+    def is_plugged_in(self) -> bool | None:
+        """Whether the vehicle is plugged in (either charging or completed)."""
+        if not (value := self.get("charging_state", None)):
+            return None
+        return value in ["Charging", "Complete"]
+
+    @property
+    def is_charging(self) -> bool | None:
+        """Whether the vehicle is actively charging."""
+        if not (value := self.get("charging_state", None)):
+            return None
+        return value == "Charging"

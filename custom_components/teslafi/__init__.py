@@ -13,11 +13,14 @@ from .coordinator import TeslaFiCoordinator
 
 
 PLATFORMS: list[Platform] = [
-    # Platform.BINARY_SENSOR,
+    # TODO? Platform.ALARM_CONTROL_PANEL,
+    Platform.BINARY_SENSOR,
+    # TODO: Platform.COVER,
+    # TODO: Platform.LOCK,
     # Platform.SELECT,
     Platform.SENSOR,
-    # Platform.SWITCH,
-    # Platform.UPDATE,
+    # TODO: Platform.SWITCH,
+    # TODO: Platform.UPDATE,
 ]
 
 

@@ -4,6 +4,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Generic, TypeVar, cast
 from typing_extensions import override
+from homeassistant.components.binary_sensor import BinarySensorEntityDescription
 from homeassistant.components.sensor import SensorEntityDescription
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo, EntityDescription
@@ -52,9 +53,9 @@ class TeslaFiEntity(CoordinatorEntity[TeslaFiCoordinator], Generic[_BaseEntityDe
 
     def _get_value(self) -> StateType:
         LOGGER.debug("getting value for %s", self.entity_description.key)
-        return cast(
-            StateType, self.entity_description.value(self.coordinator.data, self.hass)
-        )
+        upstream = self.entity_description.value(self.coordinator.data, self.hass)
+        converted = self.entity_description.convert(upstream)
+        return cast(StateType, converted)
 
     @property
     def device_info(self) -> DeviceInfo:
@@ -78,16 +79,16 @@ class TeslaFiEntity(CoordinatorEntity[TeslaFiCoordinator], Generic[_BaseEntityDe
         )
 
 
-
-
 @dataclass
 class TeslaFiBaseEntityDescription(EntityDescription):
     """Base TeslaFi EntityDescription"""
     has_entity_name = True
-    value: Callable[[dict, HomeAssistant], any] = None
+    value: Callable[[TeslaFiVehicle, HomeAssistant], any] = None
     """Callable to obtain the value. Defaults to `data[key]`."""
-    available: Callable[[bool, dict, HomeAssistant], bool] = None
+    available: Callable[[bool, TeslaFiVehicle, HomeAssistant], bool] = None
     """Optional Callable to determine if the entity is available."""
+    convert: Callable[[any], any] = lambda u: u
+    """Optional Callable to convert the upstream value."""
 
     def __post_init__(self):
         # Needs to be in post-init to reference self.key
@@ -98,3 +99,28 @@ class TeslaFiBaseEntityDescription(EntityDescription):
 @dataclass
 class TeslaFiSensorEntityDescription(SensorEntityDescription, TeslaFiBaseEntityDescription):
     """TeslaFi Sensor EntityDescription"""
+
+
+@dataclass
+class TeslaFiBinarySensorEntityDescription(BinarySensorEntityDescription, TeslaFiBaseEntityDescription):
+    """TeslaFi BinarySensor EntityDescription"""
+    # Redefine return type from TFBED
+    value: Callable[[TeslaFiVehicle, HomeAssistant], bool] = None
+    icons: list[str] = None
+    """List of icons for `[0]=off`, `[1]=on`"""
+
+    @staticmethod
+    def convert_to_bool(value: any) -> bool:
+        """Convert the TeslaFi value to a boolean"""
+        if value is bool:
+            return value
+        if value is None:
+            return None
+        if not value:
+            return False
+        # Otherwise it might be a non-falsey string that is actually false
+        if value == "0":
+            return False
+        return bool(value)
+
+    convert: Callable[[any], bool] = convert_to_bool

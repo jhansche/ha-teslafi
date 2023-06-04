@@ -58,6 +58,7 @@ SENSORS = [
         name="Shift State",
         icon="mdi:car-shift-pattern",
         device_class=SensorDeviceClass.ENUM,
+        entity_category=EntityCategory.DIAGNOSTIC,
         options=["P", "R", "N", "D"],
     ),
     # endregion
@@ -95,7 +96,7 @@ SENSORS = [
         native_unit_of_measurement=UnitOfElectricPotential.VOLT,
         device_class=SensorDeviceClass.VOLTAGE,
         entity_category=EntityCategory.DIAGNOSTIC,
-        available=lambda u, d, h: u and d.get('carState', None) == 'Charging',
+        available=lambda u, d, h: u and d.is_plugged_in,
     ),
     TeslaFiSensorEntityDescription(
         key="charger_actual_current",
@@ -103,7 +104,7 @@ SENSORS = [
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         device_class=SensorDeviceClass.CURRENT,
         entity_category=EntityCategory.DIAGNOSTIC,
-        available=lambda u, d, h: u and d.get('carState', None) == 'Charging',
+        available=lambda u, d, h: u and d.is_plugged_in,
     ),
     TeslaFiSensorEntityDescription(
         # NOTE: this field is kW as an integer, so its value is not very useful.
@@ -114,7 +115,7 @@ SENSORS = [
         native_unit_of_measurement=UnitOfPower.KILO_WATT,
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
-        available=lambda u, d, h: u and d.get('carState', None) == 'Charging',
+        available=lambda u, d, h: u and d.is_plugged_in,
     ),
     TeslaFiSensorEntityDescription(
         # This is a synthetic entity with actual calculation of apparent power.
@@ -125,7 +126,7 @@ SENSORS = [
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
         value=lambda d, h: int(d.get("charger_voltage")) * int(d.get("charger_actual_current")),
-        available=lambda u, d, h: u and d.get('carState', None) == 'Charging',
+        available=lambda u, d, h: u and d.is_plugged_in,
     ),
 
     # endregion
