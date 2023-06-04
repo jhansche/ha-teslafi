@@ -1,12 +1,9 @@
 """Sensors"""
 
-from collections.abc import Callable
-from dataclasses import dataclass
-from typing_extensions import override
+
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntity,
-    SensorEntityDescription,
     SensorStateClass,
 )
 from homeassistant.config_entries import ConfigEntry
@@ -24,25 +21,11 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.typing import StateType
-from typing import cast
 
-from .base import TeslaFiEntity
-from .const import DOMAIN, LOGGER
+from .base import TeslaFiEntity, TeslaFiSensorEntityDescription
+from .const import DOMAIN
 from .coordinator import TeslaFiCoordinator
 
-@dataclass
-class TeslaFiSensorEntityDescription(SensorEntityDescription):
-    """Base TeslaFi EntityDescription"""
-    has_entity_name = True
-    value: Callable[[dict, HomeAssistant], any] = None
-    available: Callable[[dict, HomeAssistant], bool] = None
-    """Callable to obtain the value. Defaults to `data[key]`."""
-
-    def __post_init__(self):
-        # Needs to be in post-init to reference self.key
-        if not self.value:
-            self.value = lambda data, hass: data.get(self.key)
 
 SENSORS = [
     # region Generic car info
@@ -68,7 +51,7 @@ SENSORS = [
         icon="mdi:speedometer",
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfSpeed.MILES_PER_HOUR,
-        available=lambda x, y: x.get('shift_state', None) == 'D',
+        available=lambda u, d, h: u and d.get('shift_state', None) == 'D',
     ),
     TeslaFiSensorEntityDescription(
         key="shift_state",
@@ -104,7 +87,7 @@ SENSORS = [
         native_unit_of_measurement=UnitOfTime.HOURS,
         device_class=SensorDeviceClass.DURATION,
         entity_category=EntityCategory.DIAGNOSTIC,
-        available=lambda x, y: x.get('charging_state', None) == 'Charging',
+        available=lambda u, d, h: u and d.get('charging_state', None) == 'Charging',
     ),
     TeslaFiSensorEntityDescription(
         key="charger_voltage",
@@ -112,7 +95,7 @@ SENSORS = [
         native_unit_of_measurement=UnitOfElectricPotential.VOLT,
         device_class=SensorDeviceClass.VOLTAGE,
         entity_category=EntityCategory.DIAGNOSTIC,
-        available=lambda x, y: x.get('carState', None) == 'Charging',
+        available=lambda u, d, h: u and d.get('carState', None) == 'Charging',
     ),
     TeslaFiSensorEntityDescription(
         key="charger_actual_current",
@@ -120,26 +103,29 @@ SENSORS = [
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         device_class=SensorDeviceClass.CURRENT,
         entity_category=EntityCategory.DIAGNOSTIC,
-        available=lambda x, y: x.get('carState', None) == 'Charging',
+        available=lambda u, d, h: u and d.get('carState', None) == 'Charging',
     ),
     TeslaFiSensorEntityDescription(
+        # NOTE: this field is kW as an integer, so its value is not very useful.
+        # Apparent Power will be more accurate.
         key="charger_power",
         name="Charger Power",
         device_class=SensorDeviceClass.POWER,
-        native_unit_of_measurement=UnitOfPower.WATT,
+        native_unit_of_measurement=UnitOfPower.KILO_WATT,
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
-        available=lambda x, y: x.get('carState', None) == 'Charging',
+        available=lambda u, d, h: u and d.get('carState', None) == 'Charging',
     ),
-        TeslaFiSensorEntityDescription(
+    TeslaFiSensorEntityDescription(
+        # This is a synthetic entity with actual calculation of apparent power.
         key="_apparent_power",
         name="Charger Apparent Power",
         native_unit_of_measurement=UnitOfApparentPower.VOLT_AMPERE,
         device_class=SensorDeviceClass.APPARENT_POWER,
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
-        value=lambda x, y: int(x.get("charger_voltage")) * int(x.get("charger_actual_current")),
-        available=lambda x, y: x.get('carState', None) == 'Charging',
+        value=lambda d, h: int(d.get("charger_voltage")) * int(d.get("charger_actual_current")),
+        available=lambda u, d, h: u and d.get('carState', None) == 'Charging',
     ),
 
     # endregion
@@ -161,32 +147,20 @@ SENSORS = [
     # endregion
 ]
 
-class TeslaFiSensor(TeslaFiEntity, SensorEntity):
+class TeslaFiSensor(TeslaFiEntity[TeslaFiSensorEntityDescription], SensorEntity):
     """Base TeslaFi Sensor"""
-    entity_description: TeslaFiSensorEntityDescription
 
     def __init__(
         self,
         coordinator: TeslaFiCoordinator,
         description: TeslaFiSensorEntityDescription,
     ) -> None:
-        super().__init__(coordinator)
-        self.entity_description = description
+        super().__init__(coordinator, description)
         self._attr_unique_id = f"{coordinator.data.vin}-{description.key}"
 
     def _handle_coordinator_update(self) -> None:
-        LOGGER.debug("on update for %s", self.entity_description.key)
-        self._attr_native_value = cast(
-            StateType, self.entity_description.value(self.coordinator.data, self.hass)
-        )
+        self._attr_native_value = self._get_value()
         return super()._handle_coordinator_update()
-
-    @property
-    @override
-    def available(self) -> bool:
-        if self.entity_description.available:
-            return self.entity_description.available(self.coordinator.data, self.hass)
-        return super().available
 
 async def async_setup_entry(
     hass: HomeAssistant,

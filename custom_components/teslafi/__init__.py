@@ -40,12 +40,15 @@ async def async_setup_entry(
     hass.data[DOMAIN][entry.entry_id] = {"coordinator": coordinator}
 
     await coordinator.async_config_entry_first_refresh()
+    # VIN is the one thing vital for all entities.
     assert coordinator.data.vin
 
     await hass.config_entries.async_forward_entry_setups(
         entry,
         PLATFORMS,
     )
+    # Everything succeeded, now tell the listeners to update their states
+    coordinator.async_update_listeners()
     return True
 
 
