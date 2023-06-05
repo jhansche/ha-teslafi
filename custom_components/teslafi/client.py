@@ -1,5 +1,6 @@
 """TeslaFi API Client"""
 
+from json import JSONDecodeError
 import httpx
 import logging
 
@@ -53,5 +54,16 @@ class TeslaFiClient:
             timeout=REQUEST_TIMEOUT,
         )
         assert response.status_code < 400
-        data = response.json()
+
+        try:
+            data = response.json()
+        except JSONDecodeError as exc:
+            if response.text == "This command is not enabled in the TeslaFi API.":
+                raise PermissionError(response.text) from exc
+            _LOGGER.warning("Error reading as json: %s", response.text, exc_info=True)
+            raise SyntaxError("Failed parsing JSON") from exc
+
+        if data is dict and (err := data.get('error')):
+            raise RuntimeError(f"{err}: {data.get('error_description')}")
+
         return data

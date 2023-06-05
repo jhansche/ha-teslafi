@@ -11,6 +11,8 @@ LOGGER = logging.getLogger(__package__)
 MANUFACTURER = "Tesla, Inc."
 
 POLLING_INTERVAL = timedelta(minutes=5)
+DELAY_LOCKS = timedelta(seconds=15)
+DELAY_WAKEUP = timedelta(seconds=30)
 
 ATTRIBUTION = "Data provided by Tesla and TeslaFi"
 

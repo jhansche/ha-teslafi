@@ -6,6 +6,7 @@ from typing import Generic, TypeVar, cast
 from typing_extensions import override
 from homeassistant.components.binary_sensor import BinarySensorEntityDescription
 from homeassistant.components.button import ButtonEntity, ButtonEntityDescription
+from homeassistant.components.lock import LockEntityDescription
 from homeassistant.components.sensor import SensorEntityDescription
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo, EntityDescription
@@ -34,6 +35,7 @@ class TeslaFiEntity(CoordinatorEntity[TeslaFiCoordinator], Generic[_BaseEntityDe
             entity_description: _BaseEntityDescriptionT,
     ) -> None:
         super().__init__(coordinator)
+        self._attr_unique_id = f"{coordinator.data.vin}-{entity_description.key}"
         self.entity_description = entity_description
 
     @property
@@ -109,6 +111,11 @@ class TeslaFiButtonEntityDescription(ButtonEntityDescription, TeslaFiBaseEntityD
 @dataclass
 class TeslaFiSensorEntityDescription(SensorEntityDescription, TeslaFiBaseEntityDescription):
     """TeslaFi Sensor EntityDescription"""
+
+
+@dataclass
+class TeslaFiLockEntityDescription(LockEntityDescription, TeslaFiBaseEntityDescription):
+    """TeslaFi Lock EntityDescription"""
 
 
 @dataclass

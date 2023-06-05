@@ -151,14 +151,6 @@ SENSORS = [
 class TeslaFiSensor(TeslaFiEntity[TeslaFiSensorEntityDescription], SensorEntity):
     """Base TeslaFi Sensor"""
 
-    def __init__(
-        self,
-        coordinator: TeslaFiCoordinator,
-        description: TeslaFiSensorEntityDescription,
-    ) -> None:
-        super().__init__(coordinator, description)
-        self._attr_unique_id = f"{coordinator.data.vin}-{description.key}"
-
     def _handle_coordinator_update(self) -> None:
         self._attr_native_value = self._get_value()
         return super()._handle_coordinator_update()

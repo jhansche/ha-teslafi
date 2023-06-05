@@ -52,14 +52,6 @@ async def async_setup_entry(
 class TeslaFiButton(TeslaFiEntity[TeslaFiButtonEntityDescription], ButtonEntity):
     """Base TeslaFi Sensor"""
 
-    def __init__(
-        self,
-        coordinator: TeslaFiCoordinator,
-        description: TeslaFiButtonEntityDescription,
-    ) -> None:
-        super().__init__(coordinator, description)
-        self._attr_unique_id = f"{coordinator.data.vin}-{description.key}"
-
     async def async_press(self) -> None:
         cmd = self.entity_description.teslafi_cmd
         response = await self.coordinator.execute_command(cmd)

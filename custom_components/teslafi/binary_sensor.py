@@ -126,11 +126,10 @@ SENSORS = [
         icons=["mdi:shield-car", "mdi:shield-lock-open"],
     ),
     TeslaFiBinarySensorEntityDescription(
-        # TODO: convert to LOCK platform
         key="locked",
         name="Locks",
+        entity_registry_enabled_default=False,
         device_class=BinarySensorDeviceClass.LOCK,
-        # device class LOCK: off=locked, on=unlocked
         convert=lambda u: not TeslaFiBinarySensorEntityDescription.convert_to_bool(u),
         icons=["mdi:car-door-lock", "mdi:car-door"],
     ),
@@ -157,14 +156,6 @@ SENSORS = [
 
 class TeslaFiBinarySensor(TeslaFiEntity[TeslaFiBinarySensorEntityDescription], BinarySensorEntity):
     """Base TeslaFi Sensor"""
-
-    def __init__(
-        self,
-        coordinator: TeslaFiCoordinator,
-        description: TeslaFiBinarySensorEntityDescription,
-    ) -> None:
-        super().__init__(coordinator, description)
-        self._attr_unique_id = f"{coordinator.data.vin}-{description.key}"
 
     def _handle_coordinator_update(self) -> None:
         self._attr_is_on = self._get_value()

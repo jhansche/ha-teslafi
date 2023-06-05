@@ -55,12 +55,24 @@ class TeslaFiVehicle(UserDict):
         return self["vin"]
 
     @property
+    def car_state(self) -> str | None:
+        """Current car state. One of: [Sleeping, Idling, Sentry, Charging, Driving]."""
+        return self.get("carState", None)
+
+    @property
     def model_year(self) -> int | None:
         """Decodes the model year from the VIN"""
         if not self.vin:
             return None
         dig = self.vin[9]
         return VIN_YEARS.get(dig, None)
+
+    @property
+    def is_locked(self) -> bool | None:
+        """Whether the vehicle is locked."""
+        if not (value := self.get("locked", None)):
+            return None
+        return value == "1"
 
     @property
     def is_sleeping(self) -> bool | None:
