@@ -63,6 +63,13 @@ class TeslaFiVehicle(UserDict):
         return VIN_YEARS.get(dig, None)
 
     @property
+    def is_sleeping(self) -> bool | None:
+        """Whether the vehicle is sleeping."""
+        if not (value := self.get("carState", None)):
+            return None
+        return value == "Sleeping"
+
+    @property
     def is_plugged_in(self) -> bool | None:
         """Whether the vehicle is plugged in (either charging or completed)."""
         if not (value := self.get("charging_state", None)):

@@ -15,6 +15,7 @@ from .coordinator import TeslaFiCoordinator
 PLATFORMS: list[Platform] = [
     # TODO? Platform.ALARM_CONTROL_PANEL,
     Platform.BINARY_SENSOR,
+    Platform.BUTTON,
     # TODO: Platform.COVER,
     # TODO: Platform.LOCK,
     # Platform.SELECT,

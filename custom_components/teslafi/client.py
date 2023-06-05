@@ -34,6 +34,14 @@ class TeslaFiClient:
         """
         return TeslaFiVehicle(await self._request("lastGood"))
 
+    async def command(self, cmd: str) -> bool:
+        """
+        Execute a command.
+        See list of commands at https://teslafi.com/api.php
+        """
+        return await self._request(cmd)
+
+
     async def _request(self, command: str = "") -> dict:
         """
         :param command: The command to send. Can be empty string, `lastGood`, etc. See

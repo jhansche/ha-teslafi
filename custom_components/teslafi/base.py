@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Generic, TypeVar, cast
 from typing_extensions import override
 from homeassistant.components.binary_sensor import BinarySensorEntityDescription
+from homeassistant.components.button import ButtonEntity, ButtonEntityDescription
 from homeassistant.components.sensor import SensorEntityDescription
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo, EntityDescription
@@ -82,6 +83,7 @@ class TeslaFiEntity(CoordinatorEntity[TeslaFiCoordinator], Generic[_BaseEntityDe
 @dataclass
 class TeslaFiBaseEntityDescription(EntityDescription):
     """Base TeslaFi EntityDescription"""
+
     has_entity_name = True
     value: Callable[[TeslaFiVehicle, HomeAssistant], any] = None
     """Callable to obtain the value. Defaults to `data[key]`."""
@@ -96,6 +98,14 @@ class TeslaFiBaseEntityDescription(EntityDescription):
             self.value = lambda data, hass: data.get(self.key)
 
 
+@dataclass(slots=True)
+class TeslaFiButtonEntityDescription(ButtonEntityDescription, TeslaFiBaseEntityDescription):
+    """TeslaFi Button EntityDescription"""
+
+    teslafi_cmd: str = None
+    """The command to send to TeslaFi on button press."""
+
+
 @dataclass
 class TeslaFiSensorEntityDescription(SensorEntityDescription, TeslaFiBaseEntityDescription):
     """TeslaFi Sensor EntityDescription"""
@@ -104,6 +114,7 @@ class TeslaFiSensorEntityDescription(SensorEntityDescription, TeslaFiBaseEntityD
 @dataclass
 class TeslaFiBinarySensorEntityDescription(BinarySensorEntityDescription, TeslaFiBaseEntityDescription):
     """TeslaFi BinarySensor EntityDescription"""
+
     # Redefine return type from TFBED
     value: Callable[[TeslaFiVehicle, HomeAssistant], bool] = None
     icons: list[str] = None
