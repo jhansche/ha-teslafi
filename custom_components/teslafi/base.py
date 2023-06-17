@@ -22,43 +22,15 @@ _BaseEntityDescriptionT = TypeVar(
     "_BaseEntityDescriptionT", bound="TeslaFiBaseEntityDescription"
 )
 
-
-class TeslaFiEntity(CoordinatorEntity[TeslaFiCoordinator], Generic[_BaseEntityDescriptionT]):
+class TeslaFiBaseEntity(CoordinatorEntity[TeslaFiCoordinator]):
     """Base TeslaFi Entity"""
     _attr_attribution = ATTRIBUTION
     _attr_has_entity_name = True
-    entity_description: _BaseEntityDescriptionT
-
-    def __init__(
-            self,
-            coordinator: TeslaFiCoordinator,
-            entity_description: _BaseEntityDescriptionT,
-    ) -> None:
-        super().__init__(coordinator)
-        self._attr_unique_id = f"{coordinator.data.vin}-{entity_description.key}"
-        self.entity_description = entity_description
 
     @property
     def car(self) -> TeslaFiVehicle:
         """Returns the vehicle data"""
         return self.coordinator.data
-
-    @property
-    @override
-    def available(self) -> bool:
-        if self.entity_description.available:
-            return self.entity_description.available(
-                super().available,
-                self.coordinator.data,
-                self.hass,
-            )
-        return super().available
-
-    def _get_value(self) -> StateType:
-        LOGGER.debug("getting value for %s", self.entity_description.key)
-        upstream = self.entity_description.value(self.coordinator.data, self.hass)
-        converted = self.entity_description.convert(upstream)
-        return cast(StateType, converted)
 
     @property
     def device_info(self) -> DeviceInfo:
@@ -80,6 +52,36 @@ class TeslaFiEntity(CoordinatorEntity[TeslaFiCoordinator], Generic[_BaseEntityDe
             hw_version=f"{car.model_year} {car.car_type or 'Tesla'}",
             suggested_area="Garage",
         )
+
+class TeslaFiEntity(TeslaFiBaseEntity, Generic[_BaseEntityDescriptionT]):
+    """Base TeslaFi Entity"""
+    entity_description: _BaseEntityDescriptionT
+
+    def __init__(
+            self,
+            coordinator: TeslaFiCoordinator,
+            entity_description: _BaseEntityDescriptionT,
+    ) -> None:
+        super().__init__(coordinator)
+        self._attr_unique_id = f"{coordinator.data.vin}-{entity_description.key}"
+        self.entity_description = entity_description
+
+    @property
+    @override
+    def available(self) -> bool:
+        if self.entity_description.available:
+            return self.entity_description.available(
+                super().available,
+                self.coordinator.data,
+                self.hass,
+            )
+        return super().available
+
+    def _get_value(self) -> StateType:
+        LOGGER.debug("getting value for %s", self.entity_description.key)
+        upstream = self.entity_description.value(self.coordinator.data, self.hass)
+        converted = self.entity_description.convert(upstream)
+        return cast(StateType, converted)
 
 
 @dataclass

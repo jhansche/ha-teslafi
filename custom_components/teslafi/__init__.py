@@ -17,6 +17,7 @@ PLATFORMS: list[Platform] = [
     Platform.BINARY_SENSOR,
     Platform.BUTTON,
     # TODO: Platform.COVER,
+    Platform.DEVICE_TRACKER,
     Platform.LOCK,
     # Platform.SELECT,
     Platform.SENSOR,
