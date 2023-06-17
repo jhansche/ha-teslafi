@@ -19,6 +19,8 @@ from .coordinator import TeslaFiCoordinator
 UPDATERS = [
     TeslaFiUpdateEntityDescription(
         key="update",
+        name="Software",
+        icon="mdi:cellphone-arrow-down",
         device_class = UpdateDeviceClass.FIRMWARE,
     ),
 ]
