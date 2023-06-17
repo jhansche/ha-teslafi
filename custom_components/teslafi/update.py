@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 from typing import Any
-from config.custom_components.teslafi.base import TeslaFiUpdateEntityDescription
-from config.custom_components.teslafi.coordinator import TeslaFiCoordinator
 
 from homeassistant.components.update import (
     UpdateDeviceClass,
@@ -16,6 +14,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .base import TeslaFiEntity, TeslaFiUpdateEntityDescription
 from .const import DOMAIN, LOGGER
+from .coordinator import TeslaFiCoordinator
 
 UPDATERS = [
     TeslaFiUpdateEntityDescription(
