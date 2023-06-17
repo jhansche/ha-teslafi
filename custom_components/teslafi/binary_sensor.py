@@ -98,6 +98,15 @@ SENSORS = [
 
     # region Others
     TeslaFiBinarySensorEntityDescription(
+        key="_is_driving",
+        name="Driving",
+        icon="mdi:steering",
+        entity_registry_visible_default=False,
+        device_class=BinarySensorDeviceClass.MOVING,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        value=lambda d, h: d.car_state == "Driving" or d.is_in_gear
+    ),
+    TeslaFiBinarySensorEntityDescription(
         key="is_user_present",
         name="Phone Key",
         icon="mdi:car-key",

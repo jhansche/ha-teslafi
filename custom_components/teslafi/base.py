@@ -113,6 +113,8 @@ class TeslaFiButtonEntityDescription(ButtonEntityDescription, TeslaFiBaseEntityD
 @dataclass
 class TeslaFiSensorEntityDescription(SensorEntityDescription, TeslaFiBaseEntityDescription):
     """TeslaFi Sensor EntityDescription"""
+    icons: dict[str, str] = None
+    """Dictionary of state -> icon"""
 
 
 @dataclass

@@ -1,6 +1,6 @@
 """Sensors"""
 
-
+from typing_extensions import override
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntity,
@@ -42,9 +42,16 @@ SENSORS = [
     TeslaFiSensorEntityDescription(
         key="carState",
         name="Car State",
-        icon="mdi:car", # TODO: icon changes by state
+        icon="mdi:car",
         device_class=SensorDeviceClass.ENUM,
         options=["Sleeping", "Idling", "Sentry", "Charging", "Driving"],
+        icons={
+            "Sleeping": "mdi:sleep",
+            "Idling": "mdi:car",
+            "Sentry": "mdi:shield-car",
+            "Charging": "mdi:ev-station",
+            "Driving": "mdi:steering",
+        },
     ),
     TeslaFiSensorEntityDescription(
         key="speed",
@@ -165,6 +172,14 @@ class TeslaFiSensor(TeslaFiEntity[TeslaFiSensorEntityDescription], SensorEntity)
     def _handle_coordinator_update(self) -> None:
         self._attr_native_value = self._get_value()
         return super()._handle_coordinator_update()
+
+    @property
+    @override
+    def icon(self) -> str | None:
+        upstream = super().icon
+        if self.entity_description.icons:
+            return self.entity_description.icons.get(self.state, upstream)
+        return upstream
 
 async def async_setup_entry(
     hass: HomeAssistant,

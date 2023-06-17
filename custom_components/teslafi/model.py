@@ -2,11 +2,12 @@
 
 from collections import UserDict
 
+from .const import VIN_YEARS
+
 
 NAN: float = float("NaN")
 
 
-from .const import LOGGER, VIN_YEARS
 class TeslaFiVehicle(UserDict):
     """TeslaFi Vehicle Data"""
 
@@ -66,6 +67,11 @@ class TeslaFiVehicle(UserDict):
             return None
         dig = self.vin[9]
         return VIN_YEARS.get(dig, None)
+
+    @property
+    def is_in_gear(self) -> bool:
+        """Whether the car is currently in gear."""
+        return self.get("shift_state", None) in ["D", "R"]
 
     @property
     def is_locked(self) -> bool | None:
