@@ -10,7 +10,11 @@ DOMAIN = "teslafi"
 LOGGER = logging.getLogger(__package__)
 MANUFACTURER = "Tesla, Inc."
 
-POLLING_INTERVAL = timedelta(minutes=5)
+POLLING_INTERVAL_DEFAULT = timedelta(minutes=3)
+# Polling interval will be switched automatically in coordinator.py
+POLLING_INTERVAL_DRIVING = timedelta(minutes=1)
+POLLING_INTERVAL_SLEEPING = timedelta(minutes=10)
+
 DELAY_LOCKS = timedelta(seconds=15)
 DELAY_WAKEUP = timedelta(seconds=30)
 

@@ -6,7 +6,13 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .client import TeslaFiClient
-from .const import DOMAIN, LOGGER, POLLING_INTERVAL
+from .const import (
+    DOMAIN,
+    LOGGER,
+    POLLING_INTERVAL_DEFAULT,
+    POLLING_INTERVAL_DRIVING,
+    POLLING_INTERVAL_SLEEPING,
+)
 from .model import TeslaFiVehicle
 
 
@@ -30,7 +36,7 @@ class TeslaFiCoordinator(DataUpdateCoordinator[TeslaFiVehicle]):
             hass,
             logger=LOGGER,
             name=DOMAIN,
-            update_interval=POLLING_INTERVAL,
+            update_interval=POLLING_INTERVAL_DEFAULT,
             update_method=self._refresh,
         )
 
@@ -51,6 +57,8 @@ class TeslaFiCoordinator(DataUpdateCoordinator[TeslaFiVehicle]):
         # - Driving = increased
         # - Sleeping = decreased
         if (stash := self.update_interval) and (temp := self._override_next_refresh):
+            LOGGER.debug("Overriding next refresh: %s instead of the usual %s",
+                        temp, stash)
             self._override_next_refresh = None
             self.update_interval = temp
             result = super()._schedule_refresh()
@@ -69,4 +77,16 @@ class TeslaFiCoordinator(DataUpdateCoordinator[TeslaFiVehicle]):
 
         assert current.vin
         assert self._vehicle.vin
+
+        if (car_state := self._vehicle.car_state) == "Sleeping":
+            self._override_next_refresh = POLLING_INTERVAL_SLEEPING
+            LOGGER.debug("car is sleeping, decreasing polling interval to %s",
+                         self._override_next_refresh)
+        elif car_state == "Driving":
+            self._override_next_refresh = POLLING_INTERVAL_DRIVING
+            LOGGER.debug("car is driving, increasing polling interval to %s",
+                         self._override_next_refresh)
+        else:
+            self._override_next_refresh = None
+
         return self._vehicle
