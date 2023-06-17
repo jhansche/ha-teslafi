@@ -1,10 +1,10 @@
 # TeslaFi Home Asisstant Integration
 
-Custom integration for Tesla Vehicles using [TeslaFi][https://teslafi.com/] API feed.
+Custom integration for Tesla Vehicles using [TeslaFi](https://teslafi.com/) API feed.
 
 **Prior To Installation**
 
-You will need your TeslaFi API Token. You can obtain the API token [here][https://teslafi.com/api.php]
+You will need your TeslaFi API Token. You can obtain the API token [here](https://teslafi.com/api.php)
 (note you will need to be logged in first).
 
 Also pay attention to the checkboxes on the "Commands" tab. Any command that is not enabled here
