@@ -3,8 +3,6 @@ from __future__ import annotations
 
 from typing import Any
 from typing_extensions import override
-from config.custom_components.teslafi.coordinator import TeslaFiCoordinator
-
 
 from homeassistant.components.device_tracker import SourceType, TrackerEntity
 from homeassistant.config_entries import ConfigEntry

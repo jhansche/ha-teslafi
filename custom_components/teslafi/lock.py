@@ -1,7 +1,6 @@
 """TeslaFi Locks"""
 
 from typing import Any
-from config.custom_components.teslafi.coordinator import TeslaFiCoordinator
 from homeassistant.components.lock import LockEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import STATE_LOCKING, STATE_UNLOCKING

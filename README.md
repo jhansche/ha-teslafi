@@ -23,14 +23,14 @@ API Tokens.
 1. Open HACS Settings and add this repository (https://github.com/jhansche/ha-teslafi/)
    as a Custom Repository (use **Integration** as the category).
 2. The `TeslaFi` page should automatically load (or find it in the HACS Store)
-3. Click `Install`
+3. Click `Download`
 4. Continue to [Setup](README.md#Setup)
 
 Alternatively, click on the button below to add the repository:
 
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?category=Integration&repository=ha-teslafi&owner=jhansche)
 
-### Manul
+### Manual
 
 Copy the `teslafi` directory from `custom_components` in this repository,
 and place inside your Home Assistant Core installation's `custom_components` directory.
