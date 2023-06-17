@@ -13,6 +13,7 @@ from homeassistant.const import (
     UnitOfApparentPower,
     UnitOfElectricCurrent,
     UnitOfElectricPotential,
+    UnitOfEnergy,
     UnitOfLength,
     UnitOfPower,
     UnitOfSpeed,
@@ -88,7 +89,7 @@ SENSORS = [
         native_unit_of_measurement=UnitOfTime.HOURS,
         device_class=SensorDeviceClass.DURATION,
         entity_category=EntityCategory.DIAGNOSTIC,
-        available=lambda u, d, h: u and d.get('charging_state', None) == 'Charging',
+        available=lambda u, d, h: u and d.is_charging,
     ),
     TeslaFiSensorEntityDescription(
         key="charger_voltage",
@@ -104,6 +105,16 @@ SENSORS = [
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         device_class=SensorDeviceClass.CURRENT,
         entity_category=EntityCategory.DIAGNOSTIC,
+        available=lambda u, d, h: u and d.is_plugged_in,
+    ),
+     TeslaFiSensorEntityDescription(
+        key="charge_energy_added",
+        name="Energy added",
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        device_class=SensorDeviceClass.ENERGY,
+        entity_registry_visible_default=False,
+        state_class=SensorStateClass.TOTAL_INCREASING,
         available=lambda u, d, h: u and d.is_plugged_in,
     ),
     TeslaFiSensorEntityDescription(
