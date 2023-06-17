@@ -5,9 +5,10 @@ from dataclasses import dataclass
 from typing import Generic, TypeVar, cast
 from typing_extensions import override
 from homeassistant.components.binary_sensor import BinarySensorEntityDescription
-from homeassistant.components.button import ButtonEntity, ButtonEntityDescription
+from homeassistant.components.button import ButtonEntityDescription
 from homeassistant.components.lock import LockEntityDescription
 from homeassistant.components.sensor import SensorEntityDescription
+from homeassistant.components.update import UpdateEntityDescription
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo, EntityDescription
 from homeassistant.helpers.typing import StateType
@@ -116,6 +117,10 @@ class TeslaFiSensorEntityDescription(SensorEntityDescription, TeslaFiBaseEntityD
     icons: dict[str, str] = None
     """Dictionary of state -> icon"""
 
+
+@dataclass
+class TeslaFiUpdateEntityDescription(UpdateEntityDescription, TeslaFiBaseEntityDescription):
+    """A class that describes update entities."""
 
 @dataclass
 class TeslaFiLockEntityDescription(LockEntityDescription, TeslaFiBaseEntityDescription):

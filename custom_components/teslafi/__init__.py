@@ -22,7 +22,7 @@ PLATFORMS: list[Platform] = [
     # Platform.SELECT,
     Platform.SENSOR,
     # TODO: Platform.SWITCH,
-    # TODO: Platform.UPDATE,
+    Platform.UPDATE,
 ]
 
 
