@@ -45,6 +45,7 @@ SENSORS = [
         icon="mdi:car",
         device_class=SensorDeviceClass.ENUM,
         options=["sleeping", "idling", "sentry", "charging", "driving"],
+        translation_key="car_state",
         icons={
             "sleeping": "mdi:sleep",
             "idling": "mdi:car",
@@ -66,6 +67,7 @@ SENSORS = [
         key="shift_state",
         name="Shift State",
         icon="mdi:car-shift-pattern",
+        translation_key="shift_state",
         device_class=SensorDeviceClass.ENUM,
         entity_category=EntityCategory.DIAGNOSTIC,
         options=list(SHIFTER_STATES.values()),
