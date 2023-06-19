@@ -126,7 +126,7 @@ SENSORS = [
         entity_category=EntityCategory.DIAGNOSTIC,
         device_class=SensorDeviceClass.ENERGY,
         entity_registry_visible_default=False,
-        state_class=SensorStateClass.TOTAL_INCREASING,
+        state_class=SensorStateClass.TOTAL,
         available=lambda u, d, h: u and d.is_plugged_in,
     ),
     TeslaFiSensorEntityDescription(
