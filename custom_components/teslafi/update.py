@@ -38,6 +38,12 @@ class TeslaFiUpdater(TeslaFiEntity[TeslaFiUpdateEntityDescription], UpdateEntity
         return (self.coordinator.data.get("newVersion") or "").strip() or self.installed_version
 
     @property
+    def extra_state_attributes(self) -> dict[str, Any] | None:
+        return {
+            "new_version_status": self.coordinator.data.get("newVersionStatus", None),
+        }
+
+    @property
     def in_progress(self) -> bool | int | None:
         status = self.coordinator.data.get("newVersionStatus", None)
         if status:
