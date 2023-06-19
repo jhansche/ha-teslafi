@@ -78,11 +78,11 @@ class TeslaFiCoordinator(DataUpdateCoordinator[TeslaFiVehicle]):
         assert current.vin
         assert self._vehicle.vin
 
-        if (car_state := self._vehicle.car_state) == "Sleeping":
+        if (car_state := self._vehicle.car_state) == "sleeping":
             self._override_next_refresh = POLLING_INTERVAL_SLEEPING
             LOGGER.debug("car is sleeping, decreasing polling interval to %s",
                          self._override_next_refresh)
-        elif car_state == "Driving":
+        elif car_state == "driving":
             self._override_next_refresh = POLLING_INTERVAL_DRIVING
             LOGGER.debug("car is driving, increasing polling interval to %s",
                          self._override_next_refresh)

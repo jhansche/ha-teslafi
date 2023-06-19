@@ -24,7 +24,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .base import TeslaFiEntity, TeslaFiSensorEntityDescription
-from .const import DOMAIN
+from .const import DOMAIN, SHIFTER_STATES
 from .coordinator import TeslaFiCoordinator
 
 
@@ -44,14 +44,15 @@ SENSORS = [
         name="Car State",
         icon="mdi:car",
         device_class=SensorDeviceClass.ENUM,
-        options=["Sleeping", "Idling", "Sentry", "Charging", "Driving"],
+        options=["sleeping", "idling", "sentry", "charging", "driving"],
         icons={
-            "Sleeping": "mdi:sleep",
-            "Idling": "mdi:car",
-            "Sentry": "mdi:shield-car",
-            "Charging": "mdi:ev-station",
-            "Driving": "mdi:steering",
+            "sleeping": "mdi:sleep",
+            "idling": "mdi:car",
+            "sentry": "mdi:shield-car",
+            "charging": "mdi:ev-station",
+            "driving": "mdi:steering",
         },
+        value=lambda d, h: d.car_state,
     ),
     TeslaFiSensorEntityDescription(
         key="speed",
@@ -59,7 +60,7 @@ SENSORS = [
         icon="mdi:speedometer",
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfSpeed.MILES_PER_HOUR,
-        available=lambda u, d, h: u and d.get('shift_state', None) == 'D',
+        available=lambda u, d, h: u and d.is_in_gear,
     ),
     TeslaFiSensorEntityDescription(
         key="shift_state",
@@ -67,7 +68,9 @@ SENSORS = [
         icon="mdi:car-shift-pattern",
         device_class=SensorDeviceClass.ENUM,
         entity_category=EntityCategory.DIAGNOSTIC,
-        options=["P", "R", "N", "D"],
+        options=list(SHIFTER_STATES.values()),
+        value=lambda d, h: d.shift_state,
+        available=lambda u, d, h: u and d.car_state == 'driving',
     ),
     # endregion
 

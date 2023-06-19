@@ -20,7 +20,12 @@ DELAY_WAKEUP = timedelta(seconds=30)
 
 ATTRIBUTION = "Data provided by Tesla and TeslaFi"
 
-
+SHIFTER_STATES = {
+    "P": "park",
+    "R": "reverse",
+    "N": "neutral",
+    "D": "drive",
+}
 VIN_YEARS = {
     'A': 2010, 'B': 2011, 'C': 2012, 'D': 2013,
     'E': 2014, 'F': 2015, 'G': 2016, 'H': 2017,

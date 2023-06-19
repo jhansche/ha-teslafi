@@ -2,10 +2,17 @@
 
 from collections import UserDict
 
-from .const import VIN_YEARS
+from .const import SHIFTER_STATES, VIN_YEARS
 
 
 NAN: float = float("NaN")
+
+def _is_state(src: str | None, expect: str) -> bool | None:
+    return None if src is None else src == expect
+def _is_state_in(src: str | None, expect: list[str]) -> bool | None:
+    return None if src is None else src in expect
+def _lower_or_none(src: str | None) -> str | None:
+    return None if src is None else src.lower()
 
 
 class TeslaFiVehicle(UserDict):
@@ -57,8 +64,8 @@ class TeslaFiVehicle(UserDict):
 
     @property
     def car_state(self) -> str | None:
-        """Current car state. One of: [Sleeping, Idling, Sentry, Charging, Driving]."""
-        return self.get("carState", None)
+        """Current car state. One of: [sleeping, idling, sentry, charging, driving]."""
+        return _lower_or_none(self.get("carState", None))
 
     @property
     def model_year(self) -> int | None:
@@ -69,9 +76,17 @@ class TeslaFiVehicle(UserDict):
         return VIN_YEARS.get(dig, None)
 
     @property
-    def is_in_gear(self) -> bool:
+    def is_in_gear(self) -> bool | None:
         """Whether the car is currently in gear."""
-        return self.get("shift_state", None) in ["D", "R"]
+        return _is_state_in(self.shift_state, ["drive", "reverse"])
+
+    @property
+    def shift_state(self) -> str | None:
+        """The car shifter state (P, R, N, D)"""
+        if not (state := self.car_state):
+            return None
+        shifter = self.get("shift_state", "P") if state == "driving" else "P"
+        return SHIFTER_STATES[shifter]
 
     @property
     def is_locked(self) -> bool | None:
@@ -83,20 +98,19 @@ class TeslaFiVehicle(UserDict):
     @property
     def is_sleeping(self) -> bool | None:
         """Whether the vehicle is sleeping."""
-        if not (value := self.get("carState", None)):
-            return None
-        return value == "Sleeping"
+        return _is_state(self.car_state, "sleeping")
+
+    @property
+    def charging_state(self) -> str | None:
+        """The current charging state. One of ['charging', 'complete', 'disconnected']."""
+        return _lower_or_none(self.get("charging_state", None))
 
     @property
     def is_plugged_in(self) -> bool | None:
         """Whether the vehicle is plugged in (either charging or completed)."""
-        if not (value := self.get("charging_state", None)):
-            return None
-        return value in ["Charging", "Complete"]
+        return _is_state_in(self.charging_state, ['charging', 'complete'])
 
     @property
     def is_charging(self) -> bool | None:
         """Whether the vehicle is actively charging."""
-        if not (value := self.get("charging_state", None)):
-            return None
-        return value == "Charging"
+        return _is_state(self.charging_state, 'charging')

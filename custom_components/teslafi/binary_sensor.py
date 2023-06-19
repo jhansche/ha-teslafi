@@ -104,7 +104,7 @@ SENSORS = [
         entity_registry_visible_default=False,
         device_class=BinarySensorDeviceClass.MOVING,
         entity_category=EntityCategory.DIAGNOSTIC,
-        value=lambda d, h: d.car_state == "Driving" or d.is_in_gear
+        value=lambda d, h: d.is_in_gear
     ),
     TeslaFiBinarySensorEntityDescription(
         key="is_user_present",
