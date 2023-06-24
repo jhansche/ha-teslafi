@@ -6,6 +6,7 @@ from typing import Generic, TypeVar, cast
 from typing_extensions import override
 from homeassistant.components.binary_sensor import BinarySensorEntityDescription
 from homeassistant.components.button import ButtonEntityDescription
+from homeassistant.components.climate import ClimateEntityDescription
 from homeassistant.components.lock import LockEntityDescription
 from homeassistant.components.sensor import SensorEntityDescription
 from homeassistant.components.update import UpdateEntityDescription
@@ -110,6 +111,10 @@ class TeslaFiButtonEntityDescription(ButtonEntityDescription, TeslaFiBaseEntityD
     teslafi_cmd: str = None
     """The command to send to TeslaFi on button press."""
 
+
+@dataclass
+class TeslaFiClimateEntityDescription(ClimateEntityDescription, TeslaFiBaseEntityDescription):
+    """TeslaFi Climate EntityDescription"""
 
 @dataclass
 class TeslaFiSensorEntityDescription(SensorEntityDescription, TeslaFiBaseEntityDescription):

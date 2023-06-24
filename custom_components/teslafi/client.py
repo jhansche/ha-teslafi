@@ -35,22 +35,22 @@ class TeslaFiClient:
         """
         return TeslaFiVehicle(await self._request("lastGood"))
 
-    async def command(self, cmd: str) -> bool:
+    async def command(self, cmd: str, **kwargs) -> bool:
         """
         Execute a command.
         See list of commands at https://teslafi.com/api.php
         """
-        return await self._request(cmd)
+        return await self._request(cmd, **kwargs)
 
 
-    async def _request(self, command: str = "") -> dict:
+    async def _request(self, command: str = "", **kwargs) -> dict:
         """
         :param command: The command to send. Can be empty string, `lastGood`, etc. See
         """
         response = await self._client.get(
             url="https://www.teslafi.com/feed.php",
             headers={"Authorization": "Bearer " + self._api_key},
-            params={"command": command},
+            params={"command": command} | kwargs,
             timeout=REQUEST_TIMEOUT,
         )
         assert response.status_code < 400
