@@ -15,7 +15,7 @@ POLLING_INTERVAL_DEFAULT = timedelta(minutes=3)
 POLLING_INTERVAL_DRIVING = timedelta(minutes=1)
 POLLING_INTERVAL_SLEEPING = timedelta(minutes=10)
 
-DELAY_CLIMATE = timedelta(seconds=15)
+DELAY_CLIMATE = timedelta(seconds=30)
 DELAY_LOCKS = timedelta(seconds=15)
 DELAY_WAKEUP = timedelta(seconds=30)
 

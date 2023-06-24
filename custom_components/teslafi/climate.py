@@ -24,19 +24,15 @@ from .const import DELAY_CLIMATE, DELAY_WAKEUP, DOMAIN, LOGGER
 CLIMATES = [
     TeslaFiClimateEntityDescription(
         key="climate",
-        name="HVAC",
+        name="Climate",
         entity_registry_enabled_default=False,
     ),
 ]
 
-PRESET_DOG_MODE = "dog"
-PRESET_CAMP_MODE = "camp"
-PRESET_KEEP_ON = "on"
-BASE_PRESETS = [
-    PRESET_CAMP_MODE,
-    PRESET_DOG_MODE,
-    PRESET_KEEP_ON,
-]
+ACTION_DOG_MODE = "dog"
+ACTION_CAMP_MODE = "camp"
+ACTION_KEEP_ON = "on"
+ACTION_DEFROST = "defrost"
 
 
 async def async_setup_entry(
@@ -61,15 +57,15 @@ class TeslaFiClimate(TeslaFiEntity[TeslaFiClimateEntityDescription], ClimateEnti
     _attr_temperature_unit = UnitOfTemperature.CELSIUS
     _attr_supported_features = ClimateEntityFeature(
         ClimateEntityFeature.TARGET_TEMPERATURE |
-        ClimateEntityFeature.PRESET_MODE |
+        # ClimateEntityFeature.PRESET_MODE |
         # TODO: Use Aux Heat for Defrost? Or Preset?
         ClimateEntityFeature.AUX_HEAT
     )
 
     _attr_fan_modes = [FAN_AUTO, FAN_OFF]
-    _attr_preset_modes = [PRESET_NONE] + BASE_PRESETS
 
     # FIXME: why isn't this inherited?
+    _attr_hvac_action = None
     _attr_hvac_mode = None
     _attr_preset_mode = None
     _attr_is_aux_heat = False
@@ -89,19 +85,21 @@ class TeslaFiClimate(TeslaFiEntity[TeslaFiClimateEntityDescription], ClimateEnti
 
         self._attr_fan_mode = FAN_AUTO if self.coordinator.data.get("fan_status") == "2" else FAN_OFF
 
-        # TODO preset modes by climate_keeper_mode
         keeper_mode = self.coordinator.data.get("climate_keeper_mode")
+        # Use hvac_action for keeper mode, since we cannot set them
         if keeper_mode == "dog":
-            self._attr_preset_mode = PRESET_DOG_MODE
+            self._attr_hvac_action = ACTION_DOG_MODE
         elif keeper_mode == "camp":
-            self._attr_preset_mode = PRESET_CAMP_MODE
+            self._attr_hvac_action = ACTION_CAMP_MODE
         elif keeper_mode == "on":
-            self._attr_preset_mode = PRESET_KEEP_ON
+            self._attr_hvac_action = ACTION_KEEP_ON
         else:
-            self._attr_preset_mode = None
+            self._attr_hvac_action = None
 
-        # TODO defrost? or switch
-        # defrost_mode=0, is_front_defroster_on=0, is_rear_defroster_on=0
+        defroster = self.coordinator.data.is_defrosting
+        self._attr_is_aux_heat = defroster
+        if defroster and not self._attr_hvac_action:
+            self._attr_hvac_action = ACTION_DEFROST
 
         # TODO seat heaters? or switches
         # seat_heater_left, seat_heater_rear_right_back, seat_heater_rear_left,
@@ -111,7 +109,22 @@ class TeslaFiClimate(TeslaFiEntity[TeslaFiClimateEntityDescription], ClimateEnti
 
         return super()._handle_coordinator_update()
 
+    async def async_turn_aux_heat_on(self) -> None:
+        LOGGER.debug("aux_heat (defrost) on")
+        await self.coordinator.execute_command("set_preconditioning_max", statement=True)
+        self._attr_is_aux_heat = True
+        self._attr_hvac_action = ACTION_DEFROST
+        self.async_write_ha_state()
+
+    async def async_turn_aux_heat_off(self) -> None:
+        LOGGER.debug("aux_heat (defrost) off")
+        await self.coordinator.execute_command("set_preconditioning_max", statement=False)
+        self._attr_is_aux_heat = False
+        self._attr_hvac_action = None
+        self.async_write_ha_state()
+
     async def async_set_hvac_mode(self, hvac_mode: HVACMode) -> None:
+        LOGGER.debug("set_hvac_mode: %s", hvac_mode)
         if hvac_mode == HVACMode.AUTO:
             cmd = "auto_conditioning_start"
         elif hvac_mode == HVACMode.OFF:
@@ -120,6 +133,8 @@ class TeslaFiClimate(TeslaFiEntity[TeslaFiClimateEntityDescription], ClimateEnti
             raise f"Mode '{hvac_mode}' not supported."
 
         await self.coordinator.execute_command(cmd)
+        self._attr_hvac_mode = hvac_mode
+        self._attr_hvac_action = None
         self.async_write_ha_state()
 
         if self.coordinator.data.is_sleeping:
@@ -129,21 +144,20 @@ class TeslaFiClimate(TeslaFiEntity[TeslaFiClimateEntityDescription], ClimateEnti
             self.coordinator.schedule_refresh_in(DELAY_CLIMATE)
 
     async def async_set_preset_mode(self, preset_mode: str) -> None:
-        # We show dog/camp/keep as presets, but we can't change them...
-
+        LOGGER.debug("set_preset_mode: %s", preset_mode)
         if preset_mode == PRESET_NONE:
+            self._attr_preset_mode = None
+            self._attr_hvac_action = None
             await self.coordinator.execute_command("auto_conditioning_stop")
             self.async_write_ha_state()
             self.coordinator.schedule_refresh_in(DELAY_CLIMATE)
-        elif preset_mode in BASE_PRESETS:
-            raise NotImplementedError(f"TeslaFi does not support setting preset {preset_mode}")
         else:
             # User presets are configurable at https://teslafi.com/climates.php
             # But we cannot discover those presets automatically. We could put these into an Options Flow?
             raise NotImplementedError(f"Unknown preset {preset_mode}")
 
     async def async_set_temperature(self, **kwargs) -> None:
-        LOGGER.info("Setting temperature, args=%s", kwargs)
+        LOGGER.debug("set_temperature: %s", kwargs)
         temperature = kwargs.get(ATTR_TEMPERATURE)
         if temperature:
             # TeslaFi expects temp in configured units:
