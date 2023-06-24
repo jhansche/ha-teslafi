@@ -1,8 +1,5 @@
 """TeslaFi Climate controls"""
 
-from config.custom_components.teslafi.base import TeslaFiClimateEntityDescription
-from config.custom_components.teslafi.coordinator import TeslaFiCoordinator
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.components.climate import (
     FAN_AUTO,
     FAN_OFF,
@@ -11,7 +8,7 @@ from homeassistant.components.climate import (
     ClimateEntityFeature,
     HVACMode,
 )
-
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import ATTR_TEMPERATURE, UnitOfTemperature
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
