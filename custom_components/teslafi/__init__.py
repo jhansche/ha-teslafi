@@ -16,6 +16,7 @@ PLATFORMS: list[Platform] = [
     # TODO? Platform.ALARM_CONTROL_PANEL,
     Platform.BINARY_SENSOR,
     Platform.BUTTON,
+    Platform.CLIMATE,
     # TODO: Platform.COVER,
     Platform.DEVICE_TRACKER,
     Platform.LOCK,

@@ -114,3 +114,12 @@ class TeslaFiVehicle(UserDict):
     def is_charging(self) -> bool | None:
         """Whether the vehicle is actively charging."""
         return _is_state(self.charging_state, 'charging')
+
+    @property
+    def is_defrosting(self) -> bool | None:
+        """Whether the defroster is on"""
+        return (
+            self.get("is_front_defroster_on") == "1" or
+            self.get("is_rear_defroster_on") == "1" or
+            self.get("defrost_mode", "0") != "0"
+        )

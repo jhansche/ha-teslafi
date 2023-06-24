@@ -40,9 +40,12 @@ class TeslaFiCoordinator(DataUpdateCoordinator[TeslaFiVehicle]):
             update_method=self._refresh,
         )
 
-    async def execute_command(self, cmd: str) -> dict:
+    async def execute_command(self, cmd: str, **kwargs) -> dict:
         """Execute the remote command."""
-        return await self._client.command(cmd)
+        LOGGER.debug(">> executing command %s; args=%s", cmd, kwargs)
+        result = await self._client.command(cmd, **kwargs)
+        LOGGER.debug("<< command %s response: %s", cmd, result)
+        return result
 
     def schedule_refresh_in(self, delta: timedelta):
         """Attempt to schedule a refresh"""
