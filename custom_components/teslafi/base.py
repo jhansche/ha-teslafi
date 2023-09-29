@@ -38,11 +38,7 @@ class TeslaFiBaseEntity(CoordinatorEntity[TeslaFiCoordinator]):
     def device_info(self) -> DeviceInfo:
         car = self.coordinator.data
         return DeviceInfo(
-            identifiers={
-                (DOMAIN, car.vehicle_id),
-                ("vin", car.vin),
-                ("tesla", car.id),
-            },
+            identifiers={(DOMAIN, car.vin)},
             configuration_url="https://www.teslafi.com/",
             manufacturer=MANUFACTURER,
             model=car.car_type,
