@@ -26,7 +26,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     _client: TeslaFiClient
 
-    VERSION = 1
+    VERSION = 2
 
     def __init__(self) -> None:
         self._client = None
