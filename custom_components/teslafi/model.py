@@ -7,10 +7,15 @@ from .const import SHIFTER_STATES, VIN_YEARS
 
 NAN: float = float("NaN")
 
+
 def _is_state(src: str | None, expect: str) -> bool | None:
     return None if src is None else src == expect
+
+
 def _is_state_in(src: str | None, expect: list[str]) -> bool | None:
     return None if src is None else src in expect
+
+
 def _lower_or_none(src: str | None) -> str | None:
     return None if src is None else src.lower()
 
@@ -108,18 +113,18 @@ class TeslaFiVehicle(UserDict):
     @property
     def is_plugged_in(self) -> bool | None:
         """Whether the vehicle is plugged in (either charging or completed)."""
-        return _is_state_in(self.charging_state, ['charging', 'complete'])
+        return _is_state_in(self.charging_state, ["charging", "complete"])
 
     @property
     def is_charging(self) -> bool | None:
         """Whether the vehicle is actively charging."""
-        return _is_state(self.charging_state, 'charging')
+        return _is_state(self.charging_state, "charging")
 
     @property
     def is_defrosting(self) -> bool | None:
         """Whether the defroster is on"""
         return (
-            self.get("is_front_defroster_on") == "1" or
-            self.get("is_rear_defroster_on") == "1" or
-            self.get("defrost_mode", "0") != "0"
+            self.get("is_front_defroster_on") == "1"
+            or self.get("is_rear_defroster_on") == "1"
+            or self.get("defrost_mode", "0") != "0"
         )

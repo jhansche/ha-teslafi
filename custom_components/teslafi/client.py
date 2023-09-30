@@ -35,13 +35,12 @@ class TeslaFiClient:
         """
         return TeslaFiVehicle(await self._request("lastGood"))
 
-    async def command(self, cmd: str, **kwargs) -> bool:
+    async def command(self, cmd: str, **kwargs) -> dict:
         """
         Execute a command.
         See list of commands at https://teslafi.com/api.php
         """
         return await self._request(cmd, **kwargs)
-
 
     async def _request(self, command: str = "", **kwargs) -> dict:
         """
@@ -63,7 +62,7 @@ class TeslaFiClient:
             _LOGGER.warning("Error reading as json: %s", response.text, exc_info=True)
             raise SyntaxError("Failed parsing JSON") from exc
 
-        if data is dict and (err := data.get('error')):
+        if data is dict and (err := data.get("error")):
             raise RuntimeError(f"{err}: {data.get('error_description')}")
 
         return data

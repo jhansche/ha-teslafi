@@ -16,7 +16,7 @@ from homeassistant.helpers.typing import StateType
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .client import TeslaFiVehicle
-from .const import ATTRIBUTION, DOMAIN, LOGGER,  MANUFACTURER
+from .const import ATTRIBUTION, DOMAIN, LOGGER, MANUFACTURER
 from .coordinator import TeslaFiCoordinator
 
 
@@ -24,8 +24,10 @@ _BaseEntityDescriptionT = TypeVar(
     "_BaseEntityDescriptionT", bound="TeslaFiBaseEntityDescription"
 )
 
+
 class TeslaFiBaseEntity(CoordinatorEntity[TeslaFiCoordinator]):
     """Base TeslaFi Entity"""
+
     _attr_attribution = ATTRIBUTION
     _attr_has_entity_name = True
 
@@ -38,11 +40,7 @@ class TeslaFiBaseEntity(CoordinatorEntity[TeslaFiCoordinator]):
     def device_info(self) -> DeviceInfo:
         car = self.coordinator.data
         return DeviceInfo(
-            identifiers={
-                (DOMAIN, car.vehicle_id),
-                ("vin", car.vin),
-                ("tesla", car.id),
-            },
+            identifiers={(DOMAIN, car.vin)},
             configuration_url="https://www.teslafi.com/",
             manufacturer=MANUFACTURER,
             model=car.car_type,
@@ -53,14 +51,16 @@ class TeslaFiBaseEntity(CoordinatorEntity[TeslaFiCoordinator]):
             suggested_area="Garage",
         )
 
+
 class TeslaFiEntity(TeslaFiBaseEntity, Generic[_BaseEntityDescriptionT]):
     """Base TeslaFi Entity"""
+
     entity_description: _BaseEntityDescriptionT
 
     def __init__(
-            self,
-            coordinator: TeslaFiCoordinator,
-            entity_description: _BaseEntityDescriptionT,
+        self,
+        coordinator: TeslaFiCoordinator,
+        entity_description: _BaseEntityDescriptionT,
     ) -> None:
         super().__init__(coordinator)
         self._attr_unique_id = f"{coordinator.data.vin}-{entity_description.key}"
@@ -103,7 +103,10 @@ class TeslaFiBaseEntityDescription(EntityDescription):
 
 
 @dataclass(slots=True)
-class TeslaFiButtonEntityDescription(ButtonEntityDescription, TeslaFiBaseEntityDescription):
+class TeslaFiButtonEntityDescription(
+    ButtonEntityDescription,
+    TeslaFiBaseEntityDescription,
+):
     """TeslaFi Button EntityDescription"""
 
     teslafi_cmd: str = None
@@ -111,27 +114,45 @@ class TeslaFiButtonEntityDescription(ButtonEntityDescription, TeslaFiBaseEntityD
 
 
 @dataclass
-class TeslaFiClimateEntityDescription(ClimateEntityDescription, TeslaFiBaseEntityDescription):
+class TeslaFiClimateEntityDescription(
+    ClimateEntityDescription,
+    TeslaFiBaseEntityDescription,
+):
     """TeslaFi Climate EntityDescription"""
 
+
 @dataclass
-class TeslaFiSensorEntityDescription(SensorEntityDescription, TeslaFiBaseEntityDescription):
+class TeslaFiSensorEntityDescription(
+    SensorEntityDescription,
+    TeslaFiBaseEntityDescription,
+):
     """TeslaFi Sensor EntityDescription"""
+
     icons: dict[str, str] = None
     """Dictionary of state -> icon"""
 
 
 @dataclass
-class TeslaFiUpdateEntityDescription(UpdateEntityDescription, TeslaFiBaseEntityDescription):
+class TeslaFiUpdateEntityDescription(
+    UpdateEntityDescription,
+    TeslaFiBaseEntityDescription,
+):
     """A class that describes update entities."""
 
+
 @dataclass
-class TeslaFiLockEntityDescription(LockEntityDescription, TeslaFiBaseEntityDescription):
+class TeslaFiLockEntityDescription(
+    LockEntityDescription,
+    TeslaFiBaseEntityDescription,
+):
     """TeslaFi Lock EntityDescription"""
 
 
 @dataclass
-class TeslaFiBinarySensorEntityDescription(BinarySensorEntityDescription, TeslaFiBaseEntityDescription):
+class TeslaFiBinarySensorEntityDescription(
+    BinarySensorEntityDescription,
+    TeslaFiBaseEntityDescription,
+):
     """TeslaFi BinarySensor EntityDescription"""
 
     # Redefine return type from TFBED
@@ -140,7 +161,7 @@ class TeslaFiBinarySensorEntityDescription(BinarySensorEntityDescription, TeslaF
     """List of icons for `[0]=off`, `[1]=on`"""
 
     @staticmethod
-    def convert_to_bool(value: any) -> bool:
+    def convert_to_bool(value: any) -> bool | None:
         """Convert the TeslaFi value to a boolean"""
         if value is bool:
             return value

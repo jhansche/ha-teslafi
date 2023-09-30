@@ -1,41 +1,41 @@
 {
-    "config": {
-        "step": {
-            "user": {
-                "title": "TeslaFi API Key",
-                "data": {
-                    "api_key": "[%key:common::config_flow::data::api_key%]"
-                }
-            }
-        },
-        "error": {
-            "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]",
-            "invalid_auth": "[%key:common::config_flow::error::invalid_auth%]",
-            "unknown": "[%key:common::config_flow::error::unknown%]"
-        },
-        "abort": {
-            "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
+  "config": {
+    "step": {
+      "user": {
+        "title": "TeslaFi API Key",
+        "data": {
+          "api_key": "[%key:common::config_flow::data::api_key%]"
         }
+      }
     },
-    "entity": {
-        "sensor": {
-            "car_state": {
-                "state": {
-                    "charging": "Charging",
-                    "driving": "Driving",
-                    "idling": "Idling",
-                    "sentry": "Sentry",
-                    "sleeping": "Sleeping"
-                }
-            },
-            "shift_state": {
-                "state": {
-                    "park": "Park",
-                    "reverse": "Reverse",
-                    "neutral": "Neutral",
-                    "drive": "Drive"
-                }
-            }
-        }
+    "error": {
+      "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]",
+      "invalid_auth": "[%key:common::config_flow::error::invalid_auth%]",
+      "unknown": "[%key:common::config_flow::error::unknown%]"
+    },
+    "abort": {
+      "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
     }
+  },
+  "entity": {
+    "sensor": {
+      "car_state": {
+        "state": {
+          "charging": "Charging",
+          "driving": "Driving",
+          "idling": "Idling",
+          "sentry": "Sentry",
+          "sleeping": "Sleeping"
+        }
+      },
+      "shift_state": {
+        "state": {
+          "park": "Park",
+          "reverse": "Reverse",
+          "neutral": "Neutral",
+          "drive": "Drive"
+        }
+      }
+    }
+  }
 }

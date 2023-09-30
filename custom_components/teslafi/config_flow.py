@@ -24,9 +24,9 @@ STEP_AUTH_SCHEMA = vol.Schema(
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Bird Buddy."""
 
-    _client: TeslaFiClient
+    _client: TeslaFiClient | None
 
-    VERSION = 1
+    VERSION = 2
 
     def __init__(self) -> None:
         self._client = None

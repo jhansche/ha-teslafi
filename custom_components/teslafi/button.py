@@ -33,6 +33,7 @@ BUTTONS = [
     ),
 ]
 
+
 async def async_setup_entry(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
@@ -42,10 +43,9 @@ async def async_setup_entry(
     coordinator: TeslaFiCoordinator
     coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
     entities: list[TeslaFiButton] = []
-    entities.extend([
-        TeslaFiButton(coordinator, description)
-        for description in BUTTONS
-    ])
+    entities.extend(
+        [TeslaFiButton(coordinator, description) for description in BUTTONS]
+    )
     async_add_entities(entities)
 
 
