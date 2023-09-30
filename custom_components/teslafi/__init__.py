@@ -14,7 +14,6 @@ from .client import TeslaFiClient
 from .const import DOMAIN, HTTP_CLIENT, LOGGER
 from .coordinator import TeslaFiCoordinator
 
-
 PLATFORMS: list[Platform] = [
     # TODO? Platform.ALARM_CONTROL_PANEL,
     Platform.BINARY_SENSOR,
@@ -82,6 +81,7 @@ async def async_remove_config_entry_device(
 ) -> bool:
     """Remove a config entry from a device."""
     return True
+
 
 async def async_migrate_entry(
     hass: HomeAssistant,

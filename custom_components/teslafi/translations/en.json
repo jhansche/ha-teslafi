@@ -1,41 +1,41 @@
 {
-    "config": {
-        "abort": {
-            "already_configured": "Device is already configured"
-        },
-        "error": {
-            "cannot_connect": "Failed to connect",
-            "invalid_auth": "Invalid authentication",
-            "unknown": "Unexpected error"
-        },
-        "step": {
-            "user": {
-                "data": {
-                    "api_key": "API Key"
-                },
-                "title": "TeslaFi API Key"
-            }
-        }
+  "config": {
+    "abort": {
+      "already_configured": "Device is already configured"
     },
-    "entity": {
-        "sensor": {
-            "car_state": {
-                "state": {
-                    "charging": "Charging",
-                    "driving": "Driving",
-                    "idling": "Idling",
-                    "sentry": "Sentry",
-                    "sleeping": "Sleeping"
-                }
-            },
-            "shift_state": {
-                "state": {
-                    "drive": "Drive",
-                    "neutral": "Neutral",
-                    "park": "Park",
-                    "reverse": "Reverse"
-                }
-            }
-        }
+    "error": {
+      "cannot_connect": "Failed to connect",
+      "invalid_auth": "Invalid authentication",
+      "unknown": "Unexpected error"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "api_key": "API Key"
+        },
+        "title": "TeslaFi API Key"
+      }
     }
+  },
+  "entity": {
+    "sensor": {
+      "car_state": {
+        "state": {
+          "charging": "Charging",
+          "driving": "Driving",
+          "idling": "Idling",
+          "sentry": "Sentry",
+          "sleeping": "Sleeping"
+        }
+      },
+      "shift_state": {
+        "state": {
+          "drive": "Drive",
+          "neutral": "Neutral",
+          "park": "Park",
+          "reverse": "Reverse"
+        }
+      }
+    }
+  }
 }

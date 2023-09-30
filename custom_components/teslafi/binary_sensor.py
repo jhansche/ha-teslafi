@@ -1,6 +1,9 @@
 """TeslaFi Binary Sensors"""
 
-from homeassistant.components.binary_sensor import BinarySensorDeviceClass, BinarySensorEntity
+from homeassistant.components.binary_sensor import (
+    BinarySensorDeviceClass,
+    BinarySensorEntity,
+)
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
@@ -19,7 +22,7 @@ SENSORS = [
         icon="mdi:ev-station",
         device_class=BinarySensorDeviceClass.BATTERY_CHARGING,
         entity_category=EntityCategory.DIAGNOSTIC,
-        value=lambda d, h: d.is_charging
+        value=lambda d, h: d.is_charging,
     ),
     TeslaFiBinarySensorEntityDescription(
         key="_is_plugged_in",
@@ -27,10 +30,9 @@ SENSORS = [
         icon="mdi:ev-plug-tesla",
         device_class=BinarySensorDeviceClass.PLUG,
         entity_category=EntityCategory.DIAGNOSTIC,
-        value=lambda d, h: d.is_plugged_in
+        value=lambda d, h: d.is_plugged_in,
     ),
     # endregion
-
     # region Non-controllable openings
     TeslaFiBinarySensorEntityDescription(
         key="df",
@@ -56,32 +58,32 @@ SENSORS = [
         icon="mdi:car-door",
         device_class=BinarySensorDeviceClass.DOOR,
     ),
-
+    # Windows
     TeslaFiBinarySensorEntityDescription(
         key="fd_window",
         name="Front Driver Window",
-        icon="mdi:car-door", # No car-window icon
+        icon="mdi:car-door",  # No car-window icon
         device_class=BinarySensorDeviceClass.WINDOW,
     ),
     TeslaFiBinarySensorEntityDescription(
         key="fp_window",
         name="Front Passenger Window",
-        icon="mdi:car-door", # No car-window icon
+        icon="mdi:car-door",  # No car-window icon
         device_class=BinarySensorDeviceClass.WINDOW,
     ),
     TeslaFiBinarySensorEntityDescription(
         key="rd_window",
         name="Rear Driver Window",
-        icon="mdi:car-door", # No car-window icon
+        icon="mdi:car-door",  # No car-window icon
         device_class=BinarySensorDeviceClass.WINDOW,
     ),
     TeslaFiBinarySensorEntityDescription(
         key="rp_window",
         name="Rear Passenger Window",
-        icon="mdi:car-door", # No car-window icon
+        icon="mdi:car-door",  # No car-window icon
         device_class=BinarySensorDeviceClass.WINDOW,
     ),
-
+    # Other openings
     TeslaFiBinarySensorEntityDescription(
         key="ft",
         name="Front Trunk",
@@ -95,7 +97,6 @@ SENSORS = [
         device_class=BinarySensorDeviceClass.OPENING,
     ),
     # endregion
-
     # region Others
     TeslaFiBinarySensorEntityDescription(
         key="_is_driving",
@@ -104,7 +105,7 @@ SENSORS = [
         entity_registry_visible_default=False,
         device_class=BinarySensorDeviceClass.MOVING,
         entity_category=EntityCategory.DIAGNOSTIC,
-        value=lambda d, h: d.is_in_gear
+        value=lambda d, h: d.is_in_gear,
     ),
     TeslaFiBinarySensorEntityDescription(
         key="is_user_present",
@@ -142,7 +143,6 @@ SENSORS = [
         convert=lambda u: not TeslaFiBinarySensorEntityDescription.convert_to_bool(u),
         icons=["mdi:car-door-lock", "mdi:car-door"],
     ),
-
     TeslaFiBinarySensorEntityDescription(
         key="valet_mode",
         name="Valet Mode",
@@ -163,7 +163,10 @@ SENSORS = [
 ]
 
 
-class TeslaFiBinarySensor(TeslaFiEntity[TeslaFiBinarySensorEntityDescription], BinarySensorEntity):
+class TeslaFiBinarySensor(
+    TeslaFiEntity[TeslaFiBinarySensorEntityDescription],
+    BinarySensorEntity,
+):
     """Base TeslaFi Sensor"""
 
     def _handle_coordinator_update(self) -> None:
@@ -180,7 +183,6 @@ class TeslaFiBinarySensor(TeslaFiEntity[TeslaFiBinarySensorEntityDescription], B
             return icons[1] if self.is_on else icons[0]
 
 
-
 async def async_setup_entry(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
@@ -190,8 +192,7 @@ async def async_setup_entry(
     coordinator: TeslaFiCoordinator
     coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
     entities: list[TeslaFiBinarySensor] = []
-    entities.extend([
-        TeslaFiBinarySensor(coordinator, description)
-        for description in SENSORS
-    ])
+    entities.extend(
+        [TeslaFiBinarySensor(coordinator, description) for description in SENSORS]
+    )
     async_add_entities(entities)

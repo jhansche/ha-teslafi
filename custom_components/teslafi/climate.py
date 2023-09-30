@@ -15,7 +15,11 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.util.unit_conversion import TemperatureConverter
 
 from .coordinator import TeslaFiCoordinator
-from .base import TeslaFiBinarySensorEntityDescription, TeslaFiClimateEntityDescription, TeslaFiEntity
+from .base import (
+    TeslaFiBinarySensorEntityDescription,
+    TeslaFiClimateEntityDescription,
+    TeslaFiEntity,
+)
 from .const import DELAY_CLIMATE, DELAY_WAKEUP, DOMAIN, LOGGER
 
 CLIMATES = [
@@ -41,11 +45,11 @@ async def async_setup_entry(
     coordinator: TeslaFiCoordinator
     coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
     entities: list[TeslaFiClimate] = []
-    entities.extend([
-        TeslaFiClimate(coordinator, description)
-        for description in CLIMATES
-    ])
+    entities.extend(
+        [TeslaFiClimate(coordinator, description) for description in CLIMATES]
+    )
     async_add_entities(entities)
+
 
 class TeslaFiClimate(TeslaFiEntity[TeslaFiClimateEntityDescription], ClimateEntity):
     """TeslaFi Climate"""
@@ -53,10 +57,7 @@ class TeslaFiClimate(TeslaFiEntity[TeslaFiClimateEntityDescription], ClimateEnti
     _attr_hvac_modes = [HVACMode.AUTO, HVACMode.OFF]
     _attr_temperature_unit = UnitOfTemperature.CELSIUS
     _attr_supported_features = ClimateEntityFeature(
-        ClimateEntityFeature.TARGET_TEMPERATURE |
-        # ClimateEntityFeature.PRESET_MODE |
-        # TODO: Use Aux Heat for Defrost? Or Preset?
-        ClimateEntityFeature.AUX_HEAT
+        ClimateEntityFeature.TARGET_TEMPERATURE | ClimateEntityFeature.AUX_HEAT
     )
 
     _attr_fan_modes = [FAN_AUTO, FAN_OFF]
@@ -69,18 +70,26 @@ class TeslaFiClimate(TeslaFiEntity[TeslaFiClimateEntityDescription], ClimateEnti
 
     def _handle_coordinator_update(self) -> None:
         # These are in Celsius, despite user settings
-        self._attr_target_temperature = float(temp) if (temp := self.coordinator.data.get("driver_temp_setting")) else None
-        self._attr_current_temperature = float(temp) if (temp := self.coordinator.data.get("inside_temp")) else None
+        self._attr_target_temperature = (
+            float(temp)
+            if (temp := self.coordinator.data.get("driver_temp_setting"))
+            else None
+        )
+        self._attr_current_temperature = (
+            float(temp) if (temp := self.coordinator.data.get("inside_temp")) else None
+        )
 
         is_on = TeslaFiBinarySensorEntityDescription.convert_to_bool(
-            self.coordinator.data.get("is_climate_on") # 0, 1
+            self.coordinator.data.get("is_climate_on")  # 0, 1
         )
         if not is_on:
             self._attr_hvac_mode = HVACMode.OFF
         else:
             self._attr_hvac_mode = HVACMode.AUTO
 
-        self._attr_fan_mode = FAN_AUTO if self.coordinator.data.get("fan_status") == "2" else FAN_OFF
+        self._attr_fan_mode = (
+            FAN_AUTO if self.coordinator.data.get("fan_status") == "2" else FAN_OFF
+        )
 
         keeper_mode = self.coordinator.data.get("climate_keeper_mode")
         # Use hvac_action for keeper mode, since we cannot set them
@@ -108,14 +117,18 @@ class TeslaFiClimate(TeslaFiEntity[TeslaFiClimateEntityDescription], ClimateEnti
 
     async def async_turn_aux_heat_on(self) -> None:
         LOGGER.debug("aux_heat (defrost) on")
-        await self.coordinator.execute_command("set_preconditioning_max", statement=True)
+        await self.coordinator.execute_command(
+            "set_preconditioning_max", statement=True
+        )
         self._attr_is_aux_heat = True
         self._attr_hvac_action = ACTION_DEFROST
         self.async_write_ha_state()
 
     async def async_turn_aux_heat_off(self) -> None:
         LOGGER.debug("aux_heat (defrost) off")
-        await self.coordinator.execute_command("set_preconditioning_max", statement=False)
+        await self.coordinator.execute_command(
+            "set_preconditioning_max", statement=False
+        )
         self._attr_is_aux_heat = False
         self._attr_hvac_action = None
         self.async_write_ha_state()
@@ -159,7 +172,7 @@ class TeslaFiClimate(TeslaFiEntity[TeslaFiClimateEntityDescription], ClimateEnti
         if temperature:
             # TeslaFi expects temp in configured units:
             #  (settings > account > measurements)
-            # but we original reported it in C
+            # but we originally reported it in C
             # So if the TeslaFi API reports F is preferred,
             # we have to convert it before sending.
             if self.coordinator.data.get("temperature", "C") == "F":

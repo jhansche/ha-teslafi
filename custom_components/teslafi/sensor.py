@@ -72,10 +72,9 @@ SENSORS = [
         entity_category=EntityCategory.DIAGNOSTIC,
         options=list(SHIFTER_STATES.values()),
         value=lambda d, h: d.shift_state,
-        available=lambda u, d, h: u and d.car_state == 'driving',
+        available=lambda u, d, h: u and d.car_state == "driving",
     ),
     # endregion
-
     # region Battery
     TeslaFiSensorEntityDescription(
         key="battery_level",
@@ -92,8 +91,7 @@ SENSORS = [
         native_unit_of_measurement=UnitOfLength.MILES,
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
-    #endregion
-
+    # endregion
     # region Charging
     TeslaFiSensorEntityDescription(
         key="time_to_full_charge",
@@ -119,7 +117,7 @@ SENSORS = [
         entity_category=EntityCategory.DIAGNOSTIC,
         available=lambda u, d, h: u and d.is_plugged_in,
     ),
-     TeslaFiSensorEntityDescription(
+    TeslaFiSensorEntityDescription(
         key="charge_energy_added",
         name="Energy added",
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
@@ -148,12 +146,11 @@ SENSORS = [
         device_class=SensorDeviceClass.APPARENT_POWER,
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
-        value=lambda d, h: int(d.get("charger_voltage")) * int(d.get("charger_actual_current")),
+        value=lambda d, h: int(d.get("charger_voltage"))
+        * int(d.get("charger_actual_current")),
         available=lambda u, d, h: u and d.is_plugged_in,
     ),
-
     # endregion
-
     # region Climate
     TeslaFiSensorEntityDescription(
         key="inside_temp",
@@ -171,6 +168,7 @@ SENSORS = [
     # endregion
 ]
 
+
 class TeslaFiSensor(TeslaFiEntity[TeslaFiSensorEntityDescription], SensorEntity):
     """Base TeslaFi Sensor"""
 
@@ -186,6 +184,7 @@ class TeslaFiSensor(TeslaFiEntity[TeslaFiSensorEntityDescription], SensorEntity)
             return self.entity_description.icons.get(self.state, upstream)
         return upstream
 
+
 async def async_setup_entry(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
@@ -195,8 +194,7 @@ async def async_setup_entry(
     coordinator: TeslaFiCoordinator
     coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
     entities: list[TeslaFiSensor] = []
-    entities.extend([
-        TeslaFiSensor(coordinator, description)
-        for description in SENSORS
-    ])
+    entities.extend(
+        [TeslaFiSensor(coordinator, description) for description in SENSORS]
+    )
     async_add_entities(entities)

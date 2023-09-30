@@ -25,6 +25,7 @@ LOCKS = [
     ),
 ]
 
+
 async def async_setup_entry(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
@@ -34,14 +35,13 @@ async def async_setup_entry(
     coordinator: TeslaFiCoordinator
     coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
     entities: list[TeslaFiLock] = []
-    entities.extend([
-        TeslaFiLock(coordinator, description)
-        for description in LOCKS
-    ])
+    entities.extend([TeslaFiLock(coordinator, description) for description in LOCKS])
     async_add_entities(entities)
+
 
 class TeslaFiLock(TeslaFiEntity[TeslaFiLockEntityDescription], LockEntity):
     """TeslaFi Door Locks"""
+
     _pending_action: str | None = None
 
     async def async_lock(self, **kwargs: Any) -> None:
@@ -85,8 +85,14 @@ class TeslaFiLock(TeslaFiEntity[TeslaFiLockEntityDescription], LockEntity):
         newest = self._get_value()
         waiting = self._pending_action is not None
         target = prev == STATE_LOCKING if waiting else None
-        LOGGER.debug("lock %s: prev=%s, new=%s, pending=%s, target=%s",
-                     self.entity_id, prev, newest, self._pending_action, target)
+        LOGGER.debug(
+            "lock %s: prev=%s, new=%s, pending=%s, target=%s",
+            self.entity_id,
+            prev,
+            newest,
+            self._pending_action,
+            target,
+        )
 
         if target is None:
             LOGGER.debug("Not waiting for a lock change, using state %s", newest)
@@ -97,7 +103,9 @@ class TeslaFiLock(TeslaFiEntity[TeslaFiLockEntityDescription], LockEntity):
             super()._handle_coordinator_update()
         elif target == newest:
             # It succeeded
-            LOGGER.debug("Waiting for %s complete, state=%s", self._pending_action, newest)
+            LOGGER.debug(
+                "Waiting for %s complete, state=%s", self._pending_action, newest
+            )
             self._attr_is_unlocking = False
             self._attr_is_locking = False
             self._pending_action = None

@@ -1,19 +1,19 @@
 {
-    "domain": "teslafi",
-    "name": "TeslaFi",
-    "codeowners": [
-        "@jhansche"
-    ],
-    "config_flow": true,
-    "dependencies": [],
-    "documentation": "https://github.com/jhansche/ha-teslafi/blob/main/README.md",
-    "iot_class": "cloud_polling",
-    "issue_tracker": "https://github.com/jhansche/ha-teslafi/issues",
-    "loggers": [
-        "teslafi"
-    ],
-    "requirements": [],
-    "ssdp": [],
-    "version": "0.0.1",
-    "zeroconf": []
+  "domain": "teslafi",
+  "name": "TeslaFi",
+  "codeowners": [
+    "@jhansche"
+  ],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/jhansche/ha-teslafi/blob/main/README.md",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/jhansche/ha-teslafi/issues",
+  "loggers": [
+    "teslafi"
+  ],
+  "requirements": [],
+  "ssdp": [],
+  "version": "0.0.1",
+  "zeroconf": []
 }

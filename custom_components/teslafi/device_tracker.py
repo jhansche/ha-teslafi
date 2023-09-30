@@ -30,6 +30,7 @@ async def async_setup_entry(
 
 class TeslaFiTracker(TeslaFiBaseEntity, TrackerEntity):
     """TeslaFi Device Tracker"""
+
     _attr_force_update = False
     _attr_icon = "mdi:car"
 
@@ -55,7 +56,7 @@ class TeslaFiTracker(TeslaFiBaseEntity, TrackerEntity):
     @property
     @override
     def location_name(self) -> str | None:
-        if (loc := self.coordinator.data.get("location")):
+        if loc := self.coordinator.data.get("location"):
             # Note: better to let HA determine the location name, instead of TeslaFi?
             # return loc
             pass
@@ -78,9 +79,27 @@ class TeslaFiTracker(TeslaFiBaseEntity, TrackerEntity):
 
 
 def _degrees_to_cardinal(deg: int) -> str:
-    dirs = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW']
-    idx = round(deg / (360. / len(dirs)))
+    dirs = [
+        "N",
+        "NNE",
+        "NE",
+        "ENE",
+        "E",
+        "ESE",
+        "SE",
+        "SSE",
+        "S",
+        "SSW",
+        "SW",
+        "WSW",
+        "W",
+        "WNW",
+        "NW",
+        "NNW",
+    ]
+    idx = round(deg / (360.0 / len(dirs)))
     return dirs[idx % len(dirs)]
 
-def _float_or_none(value :any) -> float | None:
+
+def _float_or_none(value: any) -> float | None:
     return float(value) if value is not None else None

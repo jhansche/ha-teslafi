@@ -60,8 +60,9 @@ class TeslaFiCoordinator(DataUpdateCoordinator[TeslaFiVehicle]):
         # - Driving = increased
         # - Sleeping = decreased
         if (stash := self.update_interval) and (temp := self._override_next_refresh):
-            LOGGER.debug("Overriding next refresh: %s instead of the usual %s",
-                        temp, stash)
+            LOGGER.debug(
+                "Overriding next refresh: %s instead of the usual %s", temp, stash
+            )
             self._override_next_refresh = None
             self.update_interval = temp
             result = super()._schedule_refresh()
@@ -83,12 +84,16 @@ class TeslaFiCoordinator(DataUpdateCoordinator[TeslaFiVehicle]):
 
         if (car_state := self._vehicle.car_state) == "sleeping":
             self._override_next_refresh = POLLING_INTERVAL_SLEEPING
-            LOGGER.debug("car is sleeping, decreasing polling interval to %s",
-                         self._override_next_refresh)
+            LOGGER.debug(
+                "car is sleeping, decreasing polling interval to %s",
+                self._override_next_refresh,
+            )
         elif car_state == "driving":
             self._override_next_refresh = POLLING_INTERVAL_DRIVING
-            LOGGER.debug("car is driving, increasing polling interval to %s",
-                         self._override_next_refresh)
+            LOGGER.debug(
+                "car is driving, increasing polling interval to %s",
+                self._override_next_refresh,
+            )
         else:
             self._override_next_refresh = None
 

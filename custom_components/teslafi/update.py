@@ -21,12 +21,14 @@ UPDATERS = [
         key="update",
         name="Software",
         icon="mdi:cellphone-arrow-down",
-        device_class = UpdateDeviceClass.FIRMWARE,
+        device_class=UpdateDeviceClass.FIRMWARE,
     ),
 ]
 
+
 class TeslaFiUpdater(TeslaFiEntity[TeslaFiUpdateEntityDescription], UpdateEntity):
     """Tesla Firmware updates"""
+
     _attr_supported_features = UpdateEntityFeature(UpdateEntityFeature.PROGRESS)
 
     @property
@@ -35,7 +37,9 @@ class TeslaFiUpdater(TeslaFiEntity[TeslaFiUpdateEntityDescription], UpdateEntity
 
     @property
     def latest_version(self) -> str | None:
-        return (self.coordinator.data.get("newVersion") or "").strip() or self.installed_version
+        return (
+            self.coordinator.data.get("newVersion") or ""
+        ).strip() or self.installed_version
 
     @property
     def extra_state_attributes(self) -> dict[str, Any] | None:
@@ -69,7 +73,7 @@ class TeslaFiUpdater(TeslaFiEntity[TeslaFiUpdateEntityDescription], UpdateEntity
         return super().release_url
 
     async def async_install(
-            self, version: str | None, backup: bool, **kwargs: Any
+        self, version: str | None, backup: bool, **kwargs: Any
     ) -> None:
         raise NotImplementedError("TeslaFi cannot initiate installation")
 
@@ -83,8 +87,7 @@ async def async_setup_entry(
     coordinator: TeslaFiCoordinator
     coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
     entities: list[TeslaFiUpdater] = []
-    entities.extend([
-        TeslaFiUpdater(coordinator, description)
-        for description in UPDATERS
-    ])
+    entities.extend(
+        [TeslaFiUpdater(coordinator, description) for description in UPDATERS]
+    )
     async_add_entities(entities)
