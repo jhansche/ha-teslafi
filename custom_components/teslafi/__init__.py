@@ -97,17 +97,48 @@ async def async_migrate_entry(
             dev_reg,
             config_entry.entry_id,
         )
+        if len(entries) > 1:
+            LOGGER.info("Too many devices for config entry %s", config_entry.entry_id)
+
         for device in entries:
-            if len(device.identifiers) > 1:
+            is_corrupt = len(device.identifiers) > 3 or len(entries) > 1
+
+            if len(device.config_entries) == 1 and len(device.identifiers) == 3:
+                # Only 3 identifiers: likely all we need to do is move them around
+                new_identifiers = set(
+                    (DOMAIN, identifier)
+                    for (n, identifier) in device.identifiers
+                    if n == "vin" and identifier
+                )
+                if new_identifiers:
+                    LOGGER.info(
+                        "Migrating device %s identifiers %s to %s",
+                        device.id,
+                        device.identifiers,
+                        new_identifiers,
+                    )
+
+                    dev_reg.async_update_device(
+                        device.id, new_identifiers=new_identifiers
+                    )
+                else:
+                    LOGGER.info(
+                        "Unable to migrate device %s identifiers: %s",
+                        device.id,
+                        device.identifiers,
+                    )
+                    is_corrupt = True
+
+            if is_corrupt:
                 LOGGER.warn("Removing corrupted device %s", device.id)
                 # First clear the identifiers
-                dev_reg.async_update_device(device.id, new_identifiers={})
+                dev_reg.async_update_device(device.id, new_identifiers=set())
                 # Then remove the config entry
                 # Otherwise if we removed the last config entry, it will
-                # remove the the device without updating identifiers.
+                # remove the device without updating identifiers.
                 new = dev_reg.async_update_device(
                     device.id,
-                    new_identifiers={},
+                    new_identifiers=set(),
                     remove_config_entry_id=config_entry.entry_id,
                 )
                 if new is not None:
