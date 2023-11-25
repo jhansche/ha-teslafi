@@ -26,7 +26,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     _client: TeslaFiClient | None
 
-    VERSION = 2
+    VERSION = 3
 
     def __init__(self) -> None:
         self._client = None
@@ -78,5 +78,5 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             return None
         return {
             "title": result.name,
-            "id": result.id,
+            "id": result.vin,
         }

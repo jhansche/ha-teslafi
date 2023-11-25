@@ -1,6 +1,7 @@
 """TeslaFi Object Models"""
 
 from collections import UserDict
+from typing_extensions import deprecated
 
 from .const import SHIFTER_STATES, VIN_YEARS
 
@@ -33,14 +34,16 @@ class TeslaFiVehicle(UserDict):
             super().update(filtered)
 
     @property
+    @deprecated("Use .vin instead")
     def id(self) -> str:
         """Vehicle id"""
-        return self.get("id", None)
+        return self.get("id", self.vin)
 
     @property
+    @deprecated("Use .vin instead")
     def vehicle_id(self) -> str:
         """Vehicle id"""
-        return self.get("vehicle_id", None)
+        return self.get("vehicle_id", self.vin)
 
     @property
     def odometer(self) -> float:
