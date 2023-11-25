@@ -62,7 +62,12 @@ class TeslaFiClient:
             _LOGGER.warning("Error reading as json: %s", response.text, exc_info=True)
             raise SyntaxError("Failed parsing JSON") from exc
 
-        if data is dict and (err := data.get("error")):
-            raise RuntimeError(f"{err}: {data.get('error_description')}")
+        if isinstance(data, dict):
+            if err := data.get("error"):
+                raise RuntimeError(f"{err}: {data.get('error_description')}")
+            if data.get("response", {}).get("result", None) == "unauthorized":
+                raise PermissionError(
+                    f"TeslaFi response unauthorized for api key {self._api_key}: {data}"
+                )
 
         return data
