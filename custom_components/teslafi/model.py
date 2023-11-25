@@ -60,7 +60,13 @@ class TeslaFiVehicle(UserDict):
     @property
     def car_type(self) -> str | None:
         """Car type (model). E.g. 'model3', etc."""
-        return self.get("car_type", None)
+        car_type = self.get("car_type", None)
+        if not car_type and self.vin:
+            # Decode model from VIN
+            dig = self.vin[3]
+            if dig in ["S", "3", "X", "Y"]:
+                car_type = "model%s" % dig
+        return car_type
 
     @property
     def vin(self) -> str:
