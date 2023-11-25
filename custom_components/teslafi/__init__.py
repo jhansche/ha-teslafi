@@ -130,7 +130,7 @@ async def async_migrate_entry(
                     is_corrupt = True
 
             if is_corrupt:
-                LOGGER.warn("Removing corrupted device %s", device.id)
+                LOGGER.warning("Removing corrupted device %s", device.id)
                 # First clear the identifiers
                 dev_reg.async_update_device(device.id, new_identifiers=set())
                 # Then remove the config entry
@@ -147,5 +147,36 @@ async def async_migrate_entry(
 
         current = config_entry.version = 2
         hass.config_entries.async_update_entry(config_entry)
+
+    if current < 3:
+        # v3 fixes config_entry.unique_id
+        if not config_entry.unique_id:
+            LOGGER.warning(
+                "Config entry %s does not have a unique_id: setting one now",
+                config_entry.entry_id,
+            )
+
+            client = TeslaFiClient(
+                config_entry.data[CONF_API_KEY],
+                hass.data[DOMAIN][HTTP_CLIENT],
+            )
+            coordinator = TeslaFiCoordinator(hass, client)
+
+            await coordinator.async_config_entry_first_refresh()
+            current = config_entry.version = 3
+            hass.config_entries.async_update_entry(
+                config_entry,
+                unique_id=coordinator.data.vin,
+            )
+            assert config_entry.unique_id == coordinator.data.vin
+        else:
+            # Already had a unique_id?
+            LOGGER.info(
+                "Config entry %s already has a unique_id=%s",
+                config_entry.entry_id,
+                config_entry.unique_id,
+            )
+            current = config_entry.version = 3
+            hass.config_entries.async_update_entry(config_entry)
 
     return True
