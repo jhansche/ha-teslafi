@@ -19,7 +19,7 @@ from .model import TeslaFiVehicle
 class TeslaFiCoordinator(DataUpdateCoordinator[TeslaFiVehicle]):
     """TeslaFi Update Coordinator"""
 
-    _vehicle = TeslaFiVehicle({})
+    _vehicle: TeslaFiVehicle
     data: TeslaFiVehicle
 
     _override_next_refresh: timedelta = None
@@ -30,6 +30,8 @@ class TeslaFiCoordinator(DataUpdateCoordinator[TeslaFiVehicle]):
         client: TeslaFiClient,
     ) -> None:
         self._client = client
+        self.data = None
+        self._vehicle = TeslaFiVehicle({})
         # TODO: implement custom Debouncer to ensure no more than 2x per min,
         #  as per API rate limit?
         super().__init__(
@@ -74,7 +76,7 @@ class TeslaFiCoordinator(DataUpdateCoordinator[TeslaFiVehicle]):
     async def _refresh(self) -> TeslaFiVehicle:
         """Refresh"""
         current = await self._client.last_good()
-        LOGGER.info("Last good: %s", current)
+        LOGGER.debug("Last good: %s", current)
         self._vehicle.update_non_empty(current)
         last_remote_update = self._vehicle.get("Date")
         LOGGER.debug("Remote data last updated %s", last_remote_update)
