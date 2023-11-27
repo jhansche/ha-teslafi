@@ -44,7 +44,7 @@ class TeslaFiTracker(TeslaFiBaseEntity, TrackerEntity):
         """Return entity specific state attributes."""
         heading = (
             int(h)
-            if (h := self.coordinator.data.get("heading", None)) is not None
+            if (h := self.coordinator.data.get("heading", None))
             else None
         )
         cardinal = _degrees_to_cardinal(heading) if heading is not None else None
