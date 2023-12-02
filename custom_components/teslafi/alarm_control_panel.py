@@ -10,7 +10,6 @@ from homeassistant.const import (
     STATE_ALARM_ARMED_AWAY,
     STATE_ALARM_DISARMING,
     STATE_ALARM_DISARMED,
-    EntityCategory,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -113,7 +112,7 @@ class TeslaFiSentryEntity(
                 self._attr_state = new_state
                 self._attr_changed_by = "hass"
                 self._target_state = None
-                LOGGER.info("JHH coordinator now agrees with target state!")
+                LOGGER.info("Target state succeeded: %s", target)
             else:
                 # still waiting
                 LOGGER.debug("Still waiting for %s", target)
