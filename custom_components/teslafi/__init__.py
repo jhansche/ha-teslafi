@@ -15,7 +15,7 @@ from .const import DOMAIN, HTTP_CLIENT, LOGGER
 from .coordinator import TeslaFiCoordinator
 
 PLATFORMS: list[Platform] = [
-    # TODO? Platform.ALARM_CONTROL_PANEL,
+    Platform.ALARM_CONTROL_PANEL,
     Platform.BINARY_SENSOR,
     Platform.BUTTON,
     Platform.CLIMATE,
