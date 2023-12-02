@@ -124,8 +124,7 @@ SENSORS = [
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
     TeslaFiBinarySensorEntityDescription(
-        # TODO: convert to switch (we can turn it on/off via Fi)
-        # TODO: or alarm_control_panel?
+        # See also alarm_control_panel
         key="sentry_mode",
         name="Sentry Mode",
         entity_registry_enabled_default=False,
