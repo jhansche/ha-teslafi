@@ -12,6 +12,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from .base import TeslaFiEntity, TeslaFiBinarySensorEntityDescription
 from .const import DOMAIN
 from .coordinator import TeslaFiCoordinator
+from .util import _convert_to_bool
 
 
 SENSORS = [
@@ -131,7 +132,7 @@ SENSORS = [
         device_class=BinarySensorDeviceClass.LOCK,
         entity_category=EntityCategory.DIAGNOSTIC,
         # device class LOCK: off=locked, on=unlocked
-        convert=lambda u: not TeslaFiBinarySensorEntityDescription.convert_to_bool(u),
+        convert=lambda u: not _convert_to_bool(u),
         icons=["mdi:shield-car", "mdi:shield-lock-open"],
     ),
     TeslaFiBinarySensorEntityDescription(
@@ -139,7 +140,7 @@ SENSORS = [
         name="Locks",
         entity_registry_enabled_default=False,
         device_class=BinarySensorDeviceClass.LOCK,
-        convert=lambda u: not TeslaFiBinarySensorEntityDescription.convert_to_bool(u),
+        convert=lambda u: not _convert_to_bool(u),
         icons=["mdi:car-door-lock", "mdi:car-door"],
     ),
     TeslaFiBinarySensorEntityDescription(

@@ -153,6 +153,7 @@ SENSORS = [
     TeslaFiSensorEntityDescription(
         key="_charger_level",
         name="Charger Level",
+        device_class=SensorDeviceClass.ENUM,
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
         options=["level-1", "level-2", "level-3"],

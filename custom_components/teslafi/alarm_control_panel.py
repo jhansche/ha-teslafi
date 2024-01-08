@@ -16,11 +16,11 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .base import (
     TeslaFiBaseEntityDescription,
-    TeslaFiBinarySensorEntityDescription,
     TeslaFiEntity,
 )
 from .const import DELAY_WAKEUP, DELAY_LOCKS, DOMAIN, LOGGER
 from .coordinator import TeslaFiCoordinator
+from .util import _convert_to_bool
 
 
 @dataclass
@@ -133,7 +133,7 @@ ALARMS = [
         name="Sentry Mode",
         entity_registry_enabled_default=False,
         convert=lambda v: STATE_ALARM_ARMED_AWAY
-        if TeslaFiBinarySensorEntityDescription.convert_to_bool(v)
+        if _convert_to_bool(v)
         else STATE_ALARM_DISARMED,
     ),
 ]
