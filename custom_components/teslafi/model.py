@@ -190,12 +190,12 @@ class TeslaFiVehicle(UserDict):
         if not self.is_plugged_in:
             return None
         if self.is_fast_charger:
-            return "L3"
+            return "level-3"
         if (volts := self.charger_voltage) is None:
             return None
         if volts < 200:
-            return "L1"
-        return "L2"
+            return "level-1"
+        return "level-2"
 
     @property
     def is_defrosting(self) -> bool | None:

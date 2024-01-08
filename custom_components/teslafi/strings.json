@@ -38,9 +38,9 @@
       },
       "charger_level": {
         "state": {
-          "L1": "Level 1",
-          "L2": "Level 2",
-          "L3": "Level 3 (DC)"
+          "level-1": "L1",
+          "level-2": "L2",
+          "level-3": "L3"
         }
       }
     }
