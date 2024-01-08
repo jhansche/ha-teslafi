@@ -3,8 +3,14 @@
 from collections import UserDict
 from typing_extensions import deprecated
 
-from .base import TeslaFiBinarySensorEntityDescription
 from .const import SHIFTER_STATES, VIN_YEARS
+from .util import (
+    _convert_to_bool,
+    _int_or_none,
+    _is_state,
+    _is_state_in,
+    _lower_or_none,
+)
 
 
 NAN: float = float("NaN")
@@ -16,22 +22,6 @@ CHARGER_CONNECTED_STATES = [
     "starting",
     "stopped",
 ]
-
-
-def _is_state(src: str | None, expect: str) -> bool | None:
-    return None if src is None else src == expect
-
-
-def _is_state_in(src: str | None, expect: list[str]) -> bool | None:
-    return None if src is None else src in expect
-
-
-def _lower_or_none(src: str | None) -> str | None:
-    return None if src is None else src.lower()
-
-
-def _int_or_none(src: str | None) -> int | None:
-    return None if src is None else int(src)
 
 
 class TeslaFiVehicle(UserDict):
@@ -118,7 +108,7 @@ class TeslaFiVehicle(UserDict):
     @property
     def is_locked(self) -> bool | None:
         """Whether the vehicle is locked."""
-        return TeslaFiBinarySensorEntityDescription.convert_to_bool(self.get("locked"))
+        return _convert_to_bool(self.get("locked"))
 
     @property
     def is_sleeping(self) -> bool | None:
@@ -155,11 +145,8 @@ class TeslaFiVehicle(UserDict):
         Whether the vehicle is currently connected to a 'fast' charger,
         such as a Tesla Supercharger.
         """
-        return (
-            self.is_plugged_in
-            and TeslaFiBinarySensorEntityDescription.convert_to_bool(
-                self.get("fast_charger_present", False)
-            )
+        return self.is_plugged_in and _convert_to_bool(
+            self.get("fast_charger_present", False)
         )
 
     @property

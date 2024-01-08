@@ -18,6 +18,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .client import TeslaFiVehicle
 from .const import ATTRIBUTION, DOMAIN, LOGGER, MANUFACTURER
 from .coordinator import TeslaFiCoordinator
+from .util import _convert_to_bool
 
 
 _BaseEntityDescriptionT = TypeVar(
@@ -160,18 +161,4 @@ class TeslaFiBinarySensorEntityDescription(
     icons: list[str] = None
     """List of icons for `[0]=off`, `[1]=on`"""
 
-    @staticmethod
-    def convert_to_bool(value: any) -> bool | None:
-        """Convert the TeslaFi value to a boolean"""
-        if value is bool:
-            return value
-        if value is None:
-            return None
-        if not value:
-            return False
-        # Otherwise it might be a non-falsey string that is actually false
-        if value == "0":
-            return False
-        return bool(value)
-
-    convert: Callable[[any], bool] = convert_to_bool
+    convert: Callable[[any], bool] = _convert_to_bool

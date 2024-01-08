@@ -21,6 +21,7 @@ from .base import (
     TeslaFiEntity,
 )
 from .const import DELAY_CLIMATE, DELAY_WAKEUP, DOMAIN, LOGGER
+from .util import _convert_to_bool
 
 CLIMATES = [
     TeslaFiClimateEntityDescription(
@@ -79,9 +80,7 @@ class TeslaFiClimate(TeslaFiEntity[TeslaFiClimateEntityDescription], ClimateEnti
             float(temp) if (temp := self.coordinator.data.get("inside_temp")) else None
         )
 
-        is_on = TeslaFiBinarySensorEntityDescription.convert_to_bool(
-            self.coordinator.data.get("is_climate_on")  # 0, 1
-        )
+        is_on = _convert_to_bool(self.coordinator.data.get("is_climate_on"))
         if not is_on:
             self._attr_hvac_mode = HVACMode.OFF
         else:
