@@ -3,6 +3,7 @@
 from collections import UserDict
 from typing_extensions import deprecated
 
+from .base import TeslaFiBinarySensorEntityDescription
 from .const import SHIFTER_STATES, VIN_YEARS
 
 
@@ -27,6 +28,10 @@ def _is_state_in(src: str | None, expect: list[str]) -> bool | None:
 
 def _lower_or_none(src: str | None) -> str | None:
     return None if src is None else src.lower()
+
+
+def _int_or_none(src: str | None) -> int | None:
+    return None if src is None else int(src)
 
 
 class TeslaFiVehicle(UserDict):
@@ -113,9 +118,7 @@ class TeslaFiVehicle(UserDict):
     @property
     def is_locked(self) -> bool | None:
         """Whether the vehicle is locked."""
-        if not (value := self.get("locked", None)):
-            return None
-        return value == "1"
+        return TeslaFiBinarySensorEntityDescription.convert_to_bool(self.get("locked"))
 
     @property
     def is_sleeping(self) -> bool | None:
@@ -145,6 +148,34 @@ class TeslaFiVehicle(UserDict):
     def is_charging(self) -> bool | None:
         """Whether the vehicle is actively charging."""
         return _is_state(self.charging_state, "charging")
+
+    @property
+    def is_fast_charger(self) -> bool:
+        """
+        Whether the vehicle is currently connected to a 'fast' charger,
+        such as a Tesla Supercharger.
+        """
+        return TeslaFiBinarySensorEntityDescription.convert_to_bool(
+            self.get("fast_charger_present", False)
+        )
+
+    @property
+    def charger_current(self) -> int | None:
+        """Actual charger current, in Amps."""
+        value = _int_or_none(self.get("charger_actual_current"))
+        if value is not None and value > 0:
+            return value
+        if self.is_fast_charger:
+            power = _int_or_none(self.get("charger_power"))
+            volts = self.charger_voltage
+            if power is not None and volts is not None:
+                return power / volts
+        return value
+
+    @property
+    def charger_voltage(self) -> int | None:
+        """Charger voltage, in Volts."""
+        return _int_or_none(self.get("charger_voltage"))
 
     @property
     def is_defrosting(self) -> bool | None:
