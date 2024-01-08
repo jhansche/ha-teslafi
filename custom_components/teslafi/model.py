@@ -8,6 +8,14 @@ from .const import SHIFTER_STATES, VIN_YEARS
 
 NAN: float = float("NaN")
 
+CHARGER_CONNECTED_STATES = [
+    "charging",
+    "complete",
+    "nopower",
+    "starting",
+    "stopped",
+]
+
 
 def _is_state(src: str | None, expect: str) -> bool | None:
     return None if src is None else src == expect
@@ -116,13 +124,22 @@ class TeslaFiVehicle(UserDict):
 
     @property
     def charging_state(self) -> str | None:
-        """The current charging state. One of ['charging', 'complete', 'disconnected']."""
+        """The current charging state.
+
+        One of:
+        - 'charging'
+        - 'complete'
+        - 'disconnected'
+        - 'starting'
+        - 'stopped'
+        - 'nopower'
+        """
         return _lower_or_none(self.get("charging_state", None))
 
     @property
     def is_plugged_in(self) -> bool | None:
-        """Whether the vehicle is plugged in (either charging or completed)."""
-        return _is_state_in(self.charging_state, ["charging", "complete"])
+        """Whether the vehicle is plugged in."""
+        return _is_state_in(self.charging_state, CHARGER_CONNECTED_STATES)
 
     @property
     def is_charging(self) -> bool | None:
