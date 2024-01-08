@@ -150,6 +150,16 @@ SENSORS = [
         value=lambda d, h: d.charger_voltage * d.charger_current,
         available=lambda u, d, h: u and d.is_plugged_in,
     ),
+    TeslaFiSensorEntityDescription(
+        key="_charger_level",
+        name="Charger Level",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+        options=["level-1", "level-2", "level-3"],
+        translation_key="charger_level",
+        value=lambda d, h: d.charger_level,
+        available=lambda u, d, h: u and d.is_charging,
+    ),
     # endregion
     # region Climate
     TeslaFiSensorEntityDescription(

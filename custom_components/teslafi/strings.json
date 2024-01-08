@@ -35,6 +35,13 @@
           "neutral": "Neutral",
           "drive": "Drive"
         }
+      },
+      "charger_level": {
+        "state": {
+          "level-1": "L1",
+          "level-2": "L2",
+          "level-3": "L3"
+        }
       }
     }
   }
