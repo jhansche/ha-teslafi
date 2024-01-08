@@ -116,6 +116,7 @@ SENSORS = [
         device_class=SensorDeviceClass.CURRENT,
         entity_category=EntityCategory.DIAGNOSTIC,
         available=lambda u, d, h: u and d.is_plugged_in,
+        value=lambda d, h: d.charger_current,
     ),
     TeslaFiSensorEntityDescription(
         key="charge_energy_added",
@@ -146,8 +147,7 @@ SENSORS = [
         device_class=SensorDeviceClass.APPARENT_POWER,
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
-        value=lambda d, h: int(d.get("charger_voltage"))
-        * int(d.get("charger_actual_current")),
+        value=lambda d, h: d.charger_voltage * d.charger_current,
         available=lambda u, d, h: u and d.is_plugged_in,
     ),
     # endregion
