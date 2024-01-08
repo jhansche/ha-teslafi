@@ -155,8 +155,11 @@ class TeslaFiVehicle(UserDict):
         Whether the vehicle is currently connected to a 'fast' charger,
         such as a Tesla Supercharger.
         """
-        return TeslaFiBinarySensorEntityDescription.convert_to_bool(
-            self.get("fast_charger_present", False)
+        return (
+            self.is_plugged_in
+            and TeslaFiBinarySensorEntityDescription.convert_to_bool(
+                self.get("fast_charger_present", False)
+            )
         )
 
     @property
@@ -176,6 +179,23 @@ class TeslaFiVehicle(UserDict):
     def charger_voltage(self) -> int | None:
         """Charger voltage, in Volts."""
         return _int_or_none(self.get("charger_voltage"))
+
+    @property
+    def charger_level(self) -> str | None:
+        """The charger level.
+
+        - L1: ~120VAC, slow residential charging
+        - L2: ~208-240VAC, faster residential charging
+        - L3: ~400-900VDC, fast commercial charging, i.e. Supercharger"""
+        if not self.is_plugged_in:
+            return None
+        if self.is_fast_charger:
+            return "L3"
+        if (volts := self.charger_voltage) is None:
+            return None
+        if volts < 200:
+            return "L1"
+        return "L2"
 
     @property
     def is_defrosting(self) -> bool | None:
