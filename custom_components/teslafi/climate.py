@@ -69,6 +69,8 @@ class TeslaFiClimate(TeslaFiEntity[TeslaFiClimateEntityDescription], ClimateEnti
     _attr_preset_mode = None
     _attr_is_aux_heat = False
 
+    _pending_mode = None
+
     def _handle_coordinator_update(self) -> None:
         # These are in Celsius, despite user settings
         self._attr_target_temperature = (
@@ -81,10 +83,19 @@ class TeslaFiClimate(TeslaFiEntity[TeslaFiClimateEntityDescription], ClimateEnti
         )
 
         is_on = _convert_to_bool(self.coordinator.data.get("is_climate_on"))
-        if not is_on:
-            self._attr_hvac_mode = HVACMode.OFF
+
+        new_mode = None if is_on is None else HVACMode.AUTO if is_on else HVACMode.OFF
+        want_mode = self._pending_mode
+
+        if want_mode is None:
+            self._attr_hvac_mode = new_mode
+        elif new_mode == want_mode:
+            self._attr_hvac_mode = new_mode
+            self._pending_mode = None
+            LOGGER.info("Target state succeeded: %s", want_mode)
         else:
-            self._attr_hvac_mode = HVACMode.AUTO
+            LOGGER.debug("Still waiting for %s", want_mode)
+            return self.coordinator.schedule_refresh_in(DELAY_WAKEUP)
 
         self._attr_fan_mode = (
             FAN_AUTO if self.coordinator.data.get("fan_status") == "2" else FAN_OFF
@@ -141,6 +152,7 @@ class TeslaFiClimate(TeslaFiEntity[TeslaFiClimateEntityDescription], ClimateEnti
         else:
             raise f"Mode '{hvac_mode}' not supported."
 
+        self._pending_mode = hvac_mode
         await self.coordinator.execute_command(cmd)
         self._attr_hvac_mode = hvac_mode
         self._attr_hvac_action = None

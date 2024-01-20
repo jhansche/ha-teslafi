@@ -46,11 +46,12 @@ class TeslaFiClient:
         """
         :param command: The command to send. Can be empty string, `lastGood`, etc. See
         """
+        timeout = kwargs.get("wake", 0) + REQUEST_TIMEOUT
         response = await self._client.get(
             url="https://www.teslafi.com/feed.php",
             headers={"Authorization": "Bearer " + self._api_key},
             params={"command": command} | kwargs,
-            timeout=REQUEST_TIMEOUT,
+            timeout=timeout,
         )
         assert response.status_code < 400
 
