@@ -7,6 +7,7 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .client import TeslaFiClient
 from .const import (
+    DELAY_CMD_WAKE,
     DOMAIN,
     LOGGER,
     POLLING_INTERVAL_DEFAULT,
@@ -44,6 +45,8 @@ class TeslaFiCoordinator(DataUpdateCoordinator[TeslaFiVehicle]):
 
     async def execute_command(self, cmd: str, **kwargs) -> dict:
         """Execute the remote command."""
+        if self.data.is_sleeping:
+            kwargs["wake"] = DELAY_CMD_WAKE.seconds
         LOGGER.debug(">> executing command %s; args=%s", cmd, kwargs)
         result = await self._client.command(cmd, **kwargs)
         LOGGER.debug("<< command %s response: %s", cmd, result)
