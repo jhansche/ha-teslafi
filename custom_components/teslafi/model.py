@@ -59,9 +59,13 @@ class TeslaFiVehicle(UserDict):
         return self.get("car_version", None)
 
     @property
-    def name(self) -> str | None:
+    def name(self) -> str:
         """Vehicle display name"""
-        return self.get("display_name")
+        return (
+            self.get("display_name", None)
+            # 2018 model3 <last-4-vin>
+            or f"{self.model_year} {self.car_type} {self.vin[-4:]}"
+        )
 
     @property
     def car_type(self) -> str | None:
