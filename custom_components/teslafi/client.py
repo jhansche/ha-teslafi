@@ -4,6 +4,7 @@ from json import JSONDecodeError
 import httpx
 import logging
 
+from .errors import VehicleNotReadyError
 from .model import TeslaFiVehicle
 
 REQUEST_TIMEOUT = 5
@@ -58,10 +59,12 @@ class TeslaFiClient:
         try:
             data = response.json()
         except JSONDecodeError as exc:
-            if response.text == "This command is not enabled in the TeslaFi API.":
-                raise PermissionError(response.text) from exc
+            if response.text.startswith("This command is not enabled"):
+                raise PermissionError(response.text)
+            if response.text.startswith("Vehicle is asleep or unavailable"):
+                raise VehicleNotReadyError(response.text)
             _LOGGER.warning("Error reading as json: %s", response.text, exc_info=True)
-            raise SyntaxError("Failed parsing JSON") from exc
+            raise exc
 
         if isinstance(data, dict):
             if err := data.get("error"):

@@ -14,6 +14,7 @@ from .const import (
     POLLING_INTERVAL_DRIVING,
     POLLING_INTERVAL_SLEEPING,
 )
+from .errors import VehicleNotReadyError
 from .model import TeslaFiVehicle
 
 
@@ -48,7 +49,10 @@ class TeslaFiCoordinator(DataUpdateCoordinator[TeslaFiVehicle]):
         if self.data.is_sleeping:
             kwargs["wake"] = DELAY_CMD_WAKE.seconds
         LOGGER.debug(">> executing command %s; args=%s", cmd, kwargs)
-        result = await self._client.command(cmd, **kwargs)
+        try:
+            result = await self._client.command(cmd, **kwargs)
+        except VehicleNotReadyError as e:
+            LOGGER.warning(f"Failed sending command to vehicle: {e}")
         LOGGER.debug("<< command %s response: %s", cmd, result)
         return result
 
