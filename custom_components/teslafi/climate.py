@@ -59,7 +59,11 @@ class TeslaFiClimate(TeslaFiEntity[TeslaFiClimateEntityDescription], ClimateEnti
     _attr_hvac_modes = [HVACMode.AUTO, HVACMode.OFF]
     _attr_temperature_unit = UnitOfTemperature.CELSIUS
     _attr_supported_features = ClimateEntityFeature(
-        ClimateEntityFeature.TARGET_TEMPERATURE | ClimateEntityFeature.PRESET_MODE
+        ClimateEntityFeature.TARGET_TEMPERATURE
+        | ClimateEntityFeature.PRESET_MODE
+        # FIXME: min 2024.2
+        | ClimateEntityFeature(128)
+        | ClimateEntityFeature(256)
     )
 
     _attr_fan_modes = [FAN_AUTO, FAN_OFF]
