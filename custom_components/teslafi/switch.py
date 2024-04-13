@@ -49,10 +49,12 @@ class TeslaFiSwitchEntity(
 
     async def async_turn_on(self, **kwargs: Any) -> None:
         await self.entity_description.cmd(self.coordinator, True)
+        self._attr_is_on = True
         return self.async_write_ha_state()
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         await self.entity_description.cmd(self.coordinator, False)
+        self._attr_is_on = False
         return self.async_write_ha_state()
 
 
