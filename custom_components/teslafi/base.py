@@ -10,6 +10,7 @@ from homeassistant.components.climate import ClimateEntityDescription
 from homeassistant.components.cover import CoverEntityDescription
 from homeassistant.components.lock import LockEntityDescription
 from homeassistant.components.sensor import SensorEntityDescription
+from homeassistant.components.switch import SwitchEntityDescription
 from homeassistant.components.update import UpdateEntityDescription
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo, EntityDescription
@@ -144,6 +145,19 @@ class TeslaFiSensorEntityDescription(
 
     icons: dict[str, str] = None
     """Dictionary of state -> icon"""
+
+
+@dataclass(slots=True)
+class TeslaFiSwitchEntityDescription(
+    SwitchEntityDescription,
+    TeslaFiBaseEntityDescription,
+):
+    """TeslaFi Switch EntityDescription"""
+
+    cmd: Callable[[TeslaFiCoordinator, bool], bool] = None
+    """The command to send to TeslaFi on toggle."""
+
+    convert: Callable[[any], bool] = _convert_to_bool
 
 
 @dataclass
