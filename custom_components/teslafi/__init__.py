@@ -23,6 +23,7 @@ PLATFORMS: list[Platform] = [
     Platform.COVER,
     Platform.DEVICE_TRACKER,
     Platform.LOCK,
+    Platform.NUMBER,
     # Platform.SELECT,
     Platform.SENSOR,
     Platform.SWITCH,
