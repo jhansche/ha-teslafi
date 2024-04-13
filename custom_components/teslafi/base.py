@@ -7,6 +7,7 @@ from typing_extensions import override
 from homeassistant.components.binary_sensor import BinarySensorEntityDescription
 from homeassistant.components.button import ButtonEntityDescription
 from homeassistant.components.climate import ClimateEntityDescription
+from homeassistant.components.cover import CoverEntityDescription
 from homeassistant.components.lock import LockEntityDescription
 from homeassistant.components.sensor import SensorEntityDescription
 from homeassistant.components.update import UpdateEntityDescription
@@ -120,6 +121,18 @@ class TeslaFiClimateEntityDescription(
     TeslaFiBaseEntityDescription,
 ):
     """TeslaFi Climate EntityDescription"""
+
+
+@dataclass
+class TeslaFiCoverEntityDescription(
+    CoverEntityDescription,
+    TeslaFiBaseEntityDescription,
+):
+    """TeslaFi Cover"""
+
+    value: Callable[[TeslaFiVehicle, HomeAssistant], bool] = None
+    convert: Callable[[any], bool] = _convert_to_bool
+    cmd: Callable[[TeslaFiCoordinator, bool], dict] = None
 
 
 @dataclass
