@@ -1,4 +1,5 @@
 """TeslaFi integration."""
+
 from __future__ import annotations
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform, CONF_API_KEY
@@ -19,12 +20,13 @@ PLATFORMS: list[Platform] = [
     Platform.BINARY_SENSOR,
     Platform.BUTTON,
     Platform.CLIMATE,
-    # TODO: Platform.COVER,
+    Platform.COVER,
     Platform.DEVICE_TRACKER,
     Platform.LOCK,
+    Platform.NUMBER,
     # Platform.SELECT,
     Platform.SENSOR,
-    # TODO: Platform.SWITCH,
+    Platform.SWITCH,
     Platform.UPDATE,
 ]
 

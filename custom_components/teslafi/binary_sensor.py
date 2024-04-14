@@ -18,6 +18,7 @@ from .util import _convert_to_bool
 SENSORS = [
     # region Charging
     TeslaFiBinarySensorEntityDescription(
+        # TODO: convert to switch?
         key="_is_charging",
         name="Charging",
         icon="mdi:ev-station",

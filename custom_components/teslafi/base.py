@@ -2,13 +2,17 @@
 
 from collections.abc import Callable
 from dataclasses import dataclass
+from numbers import Number
 from typing import Generic, TypeVar, cast
 from typing_extensions import override
 from homeassistant.components.binary_sensor import BinarySensorEntityDescription
 from homeassistant.components.button import ButtonEntityDescription
 from homeassistant.components.climate import ClimateEntityDescription
+from homeassistant.components.cover import CoverEntityDescription
 from homeassistant.components.lock import LockEntityDescription
+from homeassistant.components.number import NumberEntityDescription
 from homeassistant.components.sensor import SensorEntityDescription
+from homeassistant.components.switch import SwitchEntityDescription
 from homeassistant.components.update import UpdateEntityDescription
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo, EntityDescription
@@ -123,6 +127,18 @@ class TeslaFiClimateEntityDescription(
 
 
 @dataclass
+class TeslaFiCoverEntityDescription(
+    CoverEntityDescription,
+    TeslaFiBaseEntityDescription,
+):
+    """TeslaFi Cover"""
+
+    value: Callable[[TeslaFiVehicle, HomeAssistant], bool] = None
+    convert: Callable[[any], bool] = _convert_to_bool
+    cmd: Callable[[TeslaFiCoordinator, bool], dict] = None
+
+
+@dataclass
 class TeslaFiSensorEntityDescription(
     SensorEntityDescription,
     TeslaFiBaseEntityDescription,
@@ -131,6 +147,36 @@ class TeslaFiSensorEntityDescription(
 
     icons: dict[str, str] = None
     """Dictionary of state -> icon"""
+
+
+@dataclass
+class TeslaFiNumberEntityDescription(
+    NumberEntityDescription,
+    TeslaFiBaseEntityDescription,
+):
+    """TeslaFi Number EntityDescription"""
+
+    convert: Callable[[any], bool] = lambda v: int(v) if v else None
+    cmd: Callable[[TeslaFiCoordinator, Number], dict] = None
+
+    max_value_key: str = None
+    """
+    If specified, look up this key for the max value,
+    otherwise fall back to max_value.
+    """
+
+
+@dataclass(slots=True)
+class TeslaFiSwitchEntityDescription(
+    SwitchEntityDescription,
+    TeslaFiBaseEntityDescription,
+):
+    """TeslaFi Switch EntityDescription"""
+
+    cmd: Callable[[TeslaFiCoordinator, bool], bool] = None
+    """The command to send to TeslaFi on toggle."""
+
+    convert: Callable[[any], bool] = _convert_to_bool
 
 
 @dataclass
