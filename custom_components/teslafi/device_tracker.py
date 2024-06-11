@@ -1,4 +1,5 @@
 """Device tracker for MyBMW vehicles."""
+
 from __future__ import annotations
 
 from typing import Any
@@ -42,11 +43,7 @@ class TeslaFiTracker(TeslaFiBaseEntity, TrackerEntity):
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return entity specific state attributes."""
-        heading = (
-            int(h)
-            if (h := self.coordinator.data.get("heading", None))
-            else None
-        )
+        heading = int(h) if (h := self.coordinator.data.get("heading", None)) else None
         cardinal = _degrees_to_cardinal(heading) if heading is not None else None
         return {
             "heading": heading,
