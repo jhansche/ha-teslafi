@@ -1,6 +1,7 @@
 """Sensors"""
 
-from typing_extensions import override
+from typing import override
+
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntity,
@@ -16,6 +17,7 @@ from homeassistant.const import (
     UnitOfEnergy,
     UnitOfLength,
     UnitOfPower,
+    UnitOfPressure,
     UnitOfSpeed,
     UnitOfTemperature,
     UnitOfTime,
@@ -26,7 +28,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from .base import TeslaFiEntity, TeslaFiSensorEntityDescription
 from .const import DOMAIN, SHIFTER_STATES
 from .coordinator import TeslaFiCoordinator
-
+from .model import TeslaFiTirePressure
 
 SENSORS = [
     # region Generic car info
@@ -187,6 +189,60 @@ SENSORS = [
     ),
     # ... climate.py
     # endregion
+    # region TPMS
+    TeslaFiSensorEntityDescription(
+        key="tpms_front_left",
+        name="TPMS Front Left",
+        icon="mdi:car-tire-alert",
+        device_class=SensorDeviceClass.PRESSURE,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfPressure.PSI,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+        fix_unit=lambda d, h: TeslaFiTirePressure.convert_unit(d.tpms.unit),
+        value=lambda d, h: d.tpms.front_left,
+        available=lambda u, d, h: u and d.tpms.front_left,
+    ),
+    TeslaFiSensorEntityDescription(
+        key="tpms_front_right",
+        name="TPMS Front Right",
+        icon="mdi:car-tire-alert",
+        device_class=SensorDeviceClass.PRESSURE,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfPressure.PSI,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+        fix_unit=lambda d, h: TeslaFiTirePressure.convert_unit(d.tpms.unit),
+        value=lambda d, h: d.tpms.front_right,
+        available=lambda u, d, h: u and d.tpms.front_right,
+    ),
+    TeslaFiSensorEntityDescription(
+        key="tpms_rear_left",
+        name="TPMS Rear Left",
+        icon="mdi:car-tire-alert",
+        device_class=SensorDeviceClass.PRESSURE,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfPressure.PSI,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+        fix_unit=lambda d, h: TeslaFiTirePressure.convert_unit(d.tpms.unit),
+        value=lambda d, h: d.tpms.rear_left,
+        available=lambda u, d, h: u and d.tpms.rear_left,
+    ),
+    TeslaFiSensorEntityDescription(
+        key="tpms_rear_right",
+        name="TPMS Rear Right",
+        icon="mdi:car-tire-alert",
+        device_class=SensorDeviceClass.PRESSURE,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfPressure.PSI,
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
+        fix_unit=lambda d, h: TeslaFiTirePressure.convert_unit(d.tpms.unit),
+        value=lambda d, h: d.tpms.rear_right,
+        available=lambda u, d, h: u and d.tpms.rear_right,
+    ),
+    # endregion
 ]
 
 
@@ -195,6 +251,10 @@ class TeslaFiSensor(TeslaFiEntity[TeslaFiSensorEntityDescription], SensorEntity)
 
     def _handle_coordinator_update(self) -> None:
         self._attr_native_value = self._get_value()
+        if self.entity_description.fix_unit and (
+            fixed := self.entity_description.fix_unit(self.coordinator.data, self.hass)
+        ):
+            self._attr_native_unit_of_measurement = fixed
         return super()._handle_coordinator_update()
 
     @property

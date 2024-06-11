@@ -148,6 +148,9 @@ class TeslaFiSensorEntityDescription(
     icons: dict[str, str] = None
     """Dictionary of state -> icon"""
 
+    fix_unit: Callable[[TeslaFiVehicle, HomeAssistant], str] = lambda d, h: None
+    """Convert the native unit of measurement. Return None to keep the original unit."""
+
 
 @dataclass
 class TeslaFiNumberEntityDescription(
@@ -156,7 +159,7 @@ class TeslaFiNumberEntityDescription(
 ):
     """TeslaFi Number EntityDescription"""
 
-    convert: Callable[[any], bool] = lambda v: int(v) if v else None
+    convert: Callable[[any], int] = lambda v: int(v) if v else None
     cmd: Callable[[TeslaFiCoordinator, Number], dict] = None
 
     max_value_key: str = None

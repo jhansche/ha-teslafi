@@ -1,7 +1,11 @@
 """TeslaFi Object Models"""
 
 from collections import UserDict
+from dataclasses import dataclass
+
 from typing_extensions import deprecated
+
+from homeassistant.const import UnitOfPressure
 
 from .const import SHIFTER_STATES, VIN_YEARS
 from .util import (
@@ -12,7 +16,6 @@ from .util import (
     _lower_or_none,
 )
 
-
 NAN: float = float("NaN")
 
 CHARGER_CONNECTED_STATES = [
@@ -22,6 +25,28 @@ CHARGER_CONNECTED_STATES = [
     "starting",
     "stopped",
 ]
+
+
+@dataclass
+class TeslaFiTirePressure:
+    """TeslaFi Tire Pressure Data."""
+
+    front_left: float | None
+    front_right: float | None
+    rear_left: float | None
+    rear_right: float | None
+    unit: str | None = None
+
+    @staticmethod
+    def convert_unit(unit: str) -> str | None:
+        """Convert units to Home Assistant's UnitOfPressure."""
+        unit_mapping = {
+            "kpa": UnitOfPressure.KPA,
+            "bar": UnitOfPressure.BAR,
+            "psi": UnitOfPressure.PSI,
+            "mmhg": UnitOfPressure.MMHG,
+        }
+        return unit_mapping.get(unit.lower(), None) if unit else None
 
 
 class TeslaFiVehicle(UserDict):
@@ -195,4 +220,31 @@ class TeslaFiVehicle(UserDict):
             self.get("is_front_defroster_on") == "1"
             or self.get("is_rear_defroster_on") == "1"
             or self.get("defrost_mode", "0") != "0"
+        )
+
+    @property
+    def tpms(self) -> TeslaFiTirePressure:
+        """TPMS state(s): (front-left, front-right, rear-left, rear-right)."""
+        return TeslaFiTirePressure(
+            front_left=(
+                float(tpms_fl)
+                if (tpms_fl := self.get("tpms_front_left", None))
+                else None
+            ),
+            front_right=(
+                float(tpms_fr)
+                if (tpms_fr := self.get("tpms_front_right", None))
+                else None
+            ),
+            rear_left=(
+                float(tpms_rl)
+                if (tpms_rl := self.get("tpms_rear_left", None))
+                else None
+            ),
+            rear_right=(
+                float(tpms_rr)
+                if (tpms_rr := self.get("tpms_rear_right", None))
+                else None
+            ),
+            unit=self.get("pressure", "psi"),
         )
