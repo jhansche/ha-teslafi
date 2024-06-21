@@ -132,9 +132,9 @@ ALARMS = [
         key="sentry_mode",
         name="Sentry Mode",
         entity_registry_enabled_default=False,
-        convert=lambda v: STATE_ALARM_ARMED_AWAY
-        if _convert_to_bool(v)
-        else STATE_ALARM_DISARMED,
+        convert=lambda v: (
+            STATE_ALARM_ARMED_AWAY if _convert_to_bool(v) else STATE_ALARM_DISARMED
+        ),
     ),
 ]
 
