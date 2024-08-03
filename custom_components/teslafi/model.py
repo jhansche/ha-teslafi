@@ -2,12 +2,14 @@
 
 from collections import UserDict
 from dataclasses import dataclass
+from datetime import datetime
+import logging
 
 from typing_extensions import deprecated
 
 from homeassistant.const import UnitOfPressure
 
-from .const import SHIFTER_STATES, VIN_YEARS
+from .const import SHIFTER_STATES, TESLAFI_DATE_FORMAT, VIN_YEARS
 from .util import (
     _convert_to_bool,
     _int_or_none,
@@ -17,6 +19,8 @@ from .util import (
 )
 
 NAN: float = float("NaN")
+
+LOGGER = logging.getLogger(__package__)
 
 CHARGER_CONNECTED_STATES = [
     "charging",
@@ -93,6 +97,19 @@ class TeslaFiVehicle(UserDict):
         )
 
     @property
+    def last_remote_update(self) -> datetime | None:
+        """Last remote update."""
+        try:
+            return (
+                datetime.strptime(s, TESLAFI_DATE_FORMAT)
+                if (s := self.get("Date", None))
+                else None
+            )
+        except ValueError:
+            LOGGER.warning("Failed to parse TeslaFi date: %s", s)
+            return None
+
+    @property
     def car_type(self) -> str | None:
         """Car type (model). E.g. 'model3', etc."""
         car_type = self.get("car_type", None)
@@ -157,6 +174,11 @@ class TeslaFiVehicle(UserDict):
         - 'nopower'
         """
         return _lower_or_none(self.get("charging_state", None))
+
+    @property
+    def charge_session_number(self) -> int | None:
+        """The current charge session number."""
+        return n if (n := _int_or_none(self.get("chargeNumber"))) != 0 else None
 
     @property
     def is_plugged_in(self) -> bool | None:

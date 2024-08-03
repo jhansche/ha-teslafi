@@ -1,7 +1,8 @@
 """TeslaFi data update coordinator"""
 
-from datetime import timedelta
-from typing_extensions import override
+from datetime import datetime, timedelta
+from typing import override
+
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
@@ -23,7 +24,8 @@ class TeslaFiCoordinator(DataUpdateCoordinator[TeslaFiVehicle]):
     _vehicle: TeslaFiVehicle
     data: TeslaFiVehicle
 
-    _override_next_refresh: timedelta = None
+    _last_charge_reset: datetime | None = None
+    _override_next_refresh: timedelta | None = None
 
     def __init__(
         self,
@@ -33,6 +35,7 @@ class TeslaFiCoordinator(DataUpdateCoordinator[TeslaFiVehicle]):
         self._client = client
         self.data = None
         self._vehicle = TeslaFiVehicle({})
+        self._last_charge_reset = None
         # TODO: implement custom Debouncer to ensure no more than 2x per min,
         #  as per API rate limit?
         super().__init__(
@@ -54,6 +57,11 @@ class TeslaFiCoordinator(DataUpdateCoordinator[TeslaFiVehicle]):
         """Attempt to schedule a refresh"""
         self._override_next_refresh = delta
         self._schedule_refresh()
+
+    @property
+    def last_charge_reset(self) -> datetime | None:
+        """Last charge reset time."""
+        return self._last_charge_reset
 
     @override
     @callback
@@ -78,9 +86,11 @@ class TeslaFiCoordinator(DataUpdateCoordinator[TeslaFiVehicle]):
         """Refresh"""
         current = await self._client.last_good()
         LOGGER.debug("Last good: %s", current)
+
+        self._infer_charge_session(prev=self.data, current=current)
+
         self._vehicle.update_non_empty(current)
-        last_remote_update = self._vehicle.get("Date")
-        LOGGER.debug("Remote data last updated %s", last_remote_update)
+        LOGGER.debug("Remote data last updated %s", self._vehicle.last_remote_update)
 
         assert current.vin
         assert self._vehicle.vin
@@ -101,3 +111,20 @@ class TeslaFiCoordinator(DataUpdateCoordinator[TeslaFiVehicle]):
             self._override_next_refresh = None
 
         return self._vehicle
+
+    def _infer_charge_session(
+        self,
+        prev: TeslaFiVehicle,
+        current: TeslaFiVehicle,
+    ):
+        if prev and current and (prev != current):
+            if not prev.is_plugged_in and current.is_plugged_in:
+                LOGGER.info("Vehicle is newly plugged in: resetting charge session")
+                self._last_charge_reset = current.last_remote_update
+            elif current.charge_session_number and (
+                prev.charge_session_number != current.charge_session_number
+            ):
+                LOGGER.info(
+                    f"New charge session detected: {prev.charge_session_number} -> {current.charge_session_number}"
+                )
+                self._last_charge_reset = current.last_remote_update

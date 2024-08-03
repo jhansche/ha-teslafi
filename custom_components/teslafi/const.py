@@ -20,6 +20,8 @@ DELAY_CMD_WAKE = timedelta(seconds=10)
 DELAY_LOCKS = timedelta(seconds=15)
 DELAY_WAKEUP = timedelta(seconds=30)
 
+TESLAFI_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
+
 ATTRIBUTION = "Data provided by Tesla and TeslaFi"
 
 SHIFTER_STATES = {

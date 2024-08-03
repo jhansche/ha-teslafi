@@ -1,5 +1,7 @@
 """Sensors"""
 
+from datetime import datetime
+from functools import cached_property
 from typing import override
 
 from homeassistant.components.sensor import (
@@ -133,6 +135,7 @@ SENSORS = [
         device_class=SensorDeviceClass.ENERGY,
         entity_registry_visible_default=False,
         state_class=SensorStateClass.TOTAL,
+        last_reset=None,
         available=lambda u, d, h: u and d.is_plugged_in,
     ),
     TeslaFiSensorEntityDescription(
@@ -255,6 +258,15 @@ class TeslaFiSensor(TeslaFiEntity[TeslaFiSensorEntityDescription], SensorEntity)
             fixed := self.entity_description.fix_unit(self.coordinator.data, self.hass)
         ):
             self._attr_native_unit_of_measurement = fixed
+
+        if self.entity_description.key == "charge_energy_added":
+            if self.entity_description.state_class == SensorStateClass.TOTAL and (
+                last_reset := self.coordinator.last_charge_reset
+            ):
+                self._attr_last_reset = last_reset
+            else:
+                self._attr_last_reset = None
+
         return super()._handle_coordinator_update()
 
     @property
