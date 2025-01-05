@@ -1,13 +1,12 @@
 """TeslaFi integration."""
 
 from __future__ import annotations
+
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import Platform, CONF_API_KEY
+from homeassistant.const import CONF_API_KEY, Platform
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.device_registry import DeviceEntry
-from homeassistant.helpers import (
-    device_registry as dr,
-)
 from homeassistant.helpers.httpx_client import create_async_httpx_client
 from homeassistant.helpers.typing import ConfigType
 
@@ -32,10 +31,9 @@ PLATFORMS: list[Platform] = [
 
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
-    """Setup the integration"""
+    """Set up the integration."""
     hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN][HTTP_CLIENT] = create_async_httpx_client(hass)
-    # TODO: services?
     return True
 
 
@@ -43,7 +41,7 @@ async def async_setup_entry(
     hass: HomeAssistant,
     entry: ConfigEntry,
 ) -> bool:
-    """Setup from a config entry"""
+    """Set up from a config entry."""
     http_client = hass.data[DOMAIN][HTTP_CLIENT]
     client = TeslaFiClient(entry.data[CONF_API_KEY], http_client)
     coordinator = TeslaFiCoordinator(hass, client)
@@ -89,7 +87,7 @@ async def async_migrate_entry(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
 ) -> bool:
-    """Migrate old entry"""
+    """Migrate old entry."""
     current = config_entry.version
     LOGGER.debug("Migrating from version %s", current)
 
@@ -107,11 +105,11 @@ async def async_migrate_entry(
 
             if len(device.config_entries) == 1 and len(device.identifiers) == 3:
                 # Only 3 identifiers: likely all we need to do is move them around
-                new_identifiers = set(
+                new_identifiers = {
                     (DOMAIN, identifier)
                     for (n, identifier) in device.identifiers
                     if n == "vin" and identifier
-                )
+                }
                 if new_identifiers:
                     LOGGER.info(
                         "Migrating device %s identifiers %s to %s",
