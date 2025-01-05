@@ -1,21 +1,15 @@
-"""TeslaFi Locks"""
+"""TeslaFi Locks."""
 
 from typing import Any
-from homeassistant.components.lock import LockEntity
+
+from homeassistant.components.lock import LockEntity, LockState
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import STATE_LOCKING, STATE_UNLOCKING
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import (
-    DELAY_LOCKS,
-    DELAY_WAKEUP,
-    DOMAIN,
-    LOGGER,
-)
-from .coordinator import TeslaFiCoordinator
 from .base import TeslaFiEntity, TeslaFiLockEntityDescription
-
+from .const import DELAY_LOCKS, DELAY_WAKEUP, DOMAIN, LOGGER
+from .coordinator import TeslaFiCoordinator
 
 LOCKS = [
     TeslaFiLockEntityDescription(
@@ -31,7 +25,7 @@ async def async_setup_entry(
     config_entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Set up from config entry"""
+    """Set up from config entry."""
     coordinator: TeslaFiCoordinator
     coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
     entities: list[TeslaFiLock] = []
@@ -40,12 +34,12 @@ async def async_setup_entry(
 
 
 class TeslaFiLock(TeslaFiEntity[TeslaFiLockEntityDescription], LockEntity):
-    """TeslaFi Door Locks"""
+    """TeslaFi Door Locks."""
 
     _pending_action: str | None = None
 
     async def async_lock(self, **kwargs: Any) -> None:
-        """Ask TeslaFi to lock the vehicle"""
+        """Ask TeslaFi to lock the vehicle."""
         self._attr_is_unlocking = False
 
         response = await self.coordinator.execute_command("door_lock")
@@ -53,7 +47,7 @@ class TeslaFiLock(TeslaFiEntity[TeslaFiLockEntityDescription], LockEntity):
 
         if response:
             LOGGER.debug("Lock response %s", response)
-            self._pending_action = STATE_LOCKING
+            self._pending_action = LockState.LOCKING
             self._attr_is_locking = True
             self.async_write_ha_state()
             if self.coordinator.data.is_sleeping:
@@ -63,7 +57,7 @@ class TeslaFiLock(TeslaFiEntity[TeslaFiLockEntityDescription], LockEntity):
                 self.coordinator.schedule_refresh_in(DELAY_LOCKS)
 
     async def async_unlock(self, **kwargs: Any) -> None:
-        """Ask TeslaFi to unlock the vehicle"""
+        """Ask TeslaFi to unlock the vehicle."""
         self._attr_is_locking = False
 
         response = await self.coordinator.execute_command("door_unlock")
@@ -71,7 +65,7 @@ class TeslaFiLock(TeslaFiEntity[TeslaFiLockEntityDescription], LockEntity):
 
         if response:
             LOGGER.debug("Unlock response %s", response)
-            self._pending_action = STATE_UNLOCKING
+            self._pending_action = LockState.UNLOCKING
             self._attr_is_unlocking = True
             self.async_write_ha_state()
             if self.coordinator.data.is_sleeping:
@@ -84,7 +78,7 @@ class TeslaFiLock(TeslaFiEntity[TeslaFiLockEntityDescription], LockEntity):
         prev = self.state
         newest = self._get_value()
         waiting = self._pending_action is not None
-        target = prev == STATE_LOCKING if waiting else None
+        target = prev == LockState.LOCKING if waiting else None
         LOGGER.debug(
             "lock %s: prev=%s, new=%s, pending=%s, target=%s",
             self.entity_id,
