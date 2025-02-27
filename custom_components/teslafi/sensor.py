@@ -116,7 +116,7 @@ SENSORS = [
         native_unit_of_measurement=UnitOfElectricPotential.VOLT,
         device_class=SensorDeviceClass.VOLTAGE,
         entity_category=EntityCategory.DIAGNOSTIC,
-        available=lambda u, d, h: u and d.is_plugged_in,
+        available=lambda u, d, h: u and d.is_charging,
     ),
     TeslaFiSensorEntityDescription(
         key="charger_actual_current",
@@ -124,7 +124,7 @@ SENSORS = [
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         device_class=SensorDeviceClass.CURRENT,
         entity_category=EntityCategory.DIAGNOSTIC,
-        available=lambda u, d, h: u and d.is_plugged_in,
+        available=lambda u, d, h: u and d.is_charging,
         value=lambda d, h: d.charger_current,
     ),
     TeslaFiSensorEntityDescription(
@@ -160,7 +160,7 @@ SENSORS = [
         entity_category=EntityCategory.DIAGNOSTIC,
         entity_registry_enabled_default=False,
         value=lambda d, h: d.charger_voltage * d.charger_current,
-        available=lambda u, d, h: u and d.is_plugged_in,
+        available=lambda u, d, h: u and d.is_charging,
     ),
     TeslaFiSensorEntityDescription(
         key="_charger_level",
