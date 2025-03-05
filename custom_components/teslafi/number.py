@@ -30,7 +30,7 @@ NUMBERS = [
         icon="mdi:current-ac",
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         native_min_value=1,
-        native_max_value=None,
+        native_max_value=48,
         step=1,
         value=lambda v, h: (
             int(x)
@@ -58,7 +58,7 @@ class TeslaFiNumber(
                 int(x) if (x := self.coordinator.data.get(max_key, None)) else None
             )
         if not max_value:
-            max_value = self.entity_description.max_value
+            max_value = self.entity_description.max_value or self.entity_description.native_max_value
         self._attr_native_max_value = max_value
         return super()._handle_coordinator_update()
 
