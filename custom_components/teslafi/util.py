@@ -11,7 +11,7 @@ def _lower_or_none(src: str | None) -> str | None:
 
 
 def _int_or_none(src: str | None) -> int | None:
-    return None if src is None else int(src)
+    return None if src is None else int(float(src))
 
 
 def _convert_to_bool(value: any) -> bool | None:
