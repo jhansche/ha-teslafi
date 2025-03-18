@@ -209,7 +209,7 @@ class TeslaFiVehicle(UserDict):
         if self.is_fast_charger:
             power = _int_or_none(self.get("charger_power"))
             volts = self.charger_voltage
-            if power is not None and volts is not None:
+            if power is not None and volts:
                 return power / volts
         return value
 
