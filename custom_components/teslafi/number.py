@@ -59,7 +59,8 @@ class TeslaFiNumber(
             )
         if not max_value:
             max_value = self.entity_description.max_value
-        self._attr_native_max_value = max_value or self._attr_native_value
+        if max_value: 
+            self._attr_native_max_value = max_value
         return super()._handle_coordinator_update()
 
     async def async_set_native_value(self, value: float) -> None:
