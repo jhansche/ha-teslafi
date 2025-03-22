@@ -96,7 +96,6 @@ class TeslaFiCoordinator(DataUpdateCoordinator[TeslaFiVehicle]):
         self._vehicle.update_non_empty(current)
         LOGGER.debug("Remote data last updated %s", self._vehicle.last_remote_update)
 
-
         assert current.vin
         assert self._vehicle.vin
 
@@ -133,4 +132,3 @@ class TeslaFiCoordinator(DataUpdateCoordinator[TeslaFiVehicle]):
                     f"New charge session detected: {prev.charge_session_number} -> {current.charge_session_number}"
                 )
                 self._last_charge_reset = current.last_remote_update
-        
