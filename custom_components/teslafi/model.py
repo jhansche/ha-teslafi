@@ -52,13 +52,6 @@ class TeslaFiTirePressure:
         }
         return unit_mapping.get(unit.lower(), None) if unit else None
 
-@dataclass
-class TeslaFiApiRequests:
-    """TeslaFi API Requests"""
-
-    commands: int | None
-    wakes: int | None
-
 
 class TeslaFiVehicle(UserDict):
     """TeslaFi Vehicle Data"""
@@ -276,12 +269,4 @@ class TeslaFiVehicle(UserDict):
                 else None
             ),
             unit=self.get("pressure", "psi"),
-        )
-    
-    @property
-    def api_requests(self) -> TeslaFiApiRequests:
-        """API requests."""
-        return TeslaFiApiRequests(
-            commands=_int_or_none(self.get("commands", None)),
-            wakes=_int_or_none(self.get("wakes", None)),
         )

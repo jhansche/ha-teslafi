@@ -35,16 +35,6 @@ class TeslaFiClient:
         Return last data point with charge data
         """
         return TeslaFiVehicle(await self._request("lastGood"))
-    
-    async def request_counts(self) -> TeslaFiVehicle:
-        """
-        Return the TeslaFi API command/wakes counts
-        """
-        
-        # TODO: Call appropriate TeslaFi API command to retrieve request counts when available
-        # response = await self._request("flash_lights", noWake="true")
-        response = {}
-        return TeslaFiVehicle(response.get("tesla_request_counter", {}))
 
     async def command(self, cmd: str, **kwargs) -> dict:
         """

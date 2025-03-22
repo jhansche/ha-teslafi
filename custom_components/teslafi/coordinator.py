@@ -52,10 +52,9 @@ class TeslaFiCoordinator(DataUpdateCoordinator[TeslaFiVehicle]):
             kwargs["wake"] = DELAY_CMD_WAKE.seconds
 
         response = await self._client.command(cmd, **kwargs)
-        await self._update_command_request_counts(response)
-        
-        # Force update HA antity data after command execution
-        await self.async_request_refresh()        
+        self._vehicle.update_non_empty(response.get("tesla_request_counter", {}))
+        self.async_set_updated_data(self._vehicle)
+
         return response
 
     def schedule_refresh_in(self, delta: timedelta):
@@ -96,10 +95,6 @@ class TeslaFiCoordinator(DataUpdateCoordinator[TeslaFiVehicle]):
 
         self._vehicle.update_non_empty(current)
         LOGGER.debug("Remote data last updated %s", self._vehicle.last_remote_update)
-        
-        api_requests = await self._client.request_counts()
-        self._vehicle.update_non_empty(api_requests)
-        LOGGER.debug("API Request counts updated %s", self._vehicle.api_requests)
 
 
         assert current.vin
@@ -138,13 +133,4 @@ class TeslaFiCoordinator(DataUpdateCoordinator[TeslaFiVehicle]):
                     f"New charge session detected: {prev.charge_session_number} -> {current.charge_session_number}"
                 )
                 self._last_charge_reset = current.last_remote_update
-                
-    async def _update_command_request_counts(
-        self,
-        response: dict
-    ) -> None:
-        """Update request counts."""
-        if response and (request_counts := response.get("tesla_request_counter")):
-            self._vehicle.update_non_empty(request_counts)
-        else:
-            LOGGER.warning("No request counts included from command response")
+        
