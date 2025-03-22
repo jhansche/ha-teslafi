@@ -246,6 +246,26 @@ SENSORS = [
         available=lambda u, d, h: u and d.tpms.rear_right,
     ),
     # endregion
+    # region TeslaFi API Counts
+        TeslaFiSensorEntityDescription(
+        key="commands",
+        name="API Commands",
+        icon="mdi:counter",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=True,
+        value=lambda d, h: d.api_requests.commands,
+        available=lambda u, d, h: u and d.api_requests.commands,
+    ),
+        TeslaFiSensorEntityDescription(
+        key="wakes",
+        name="API Wakes",
+        icon="mdi:counter",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=True,
+        value=lambda d, h: d.api_requests.wakes,
+        available=lambda u, d, h: u and d.api_requests.wakes,
+    ),
+    # endregion
 ]
 
 
