@@ -93,6 +93,7 @@ class TeslaFiCoordinator(DataUpdateCoordinator[TeslaFiVehicle]):
         self._infer_charge_session(prev=self.data, current=current)
 
         self._vehicle.update_non_empty(current)
+        LOGGER.debug("Current: %s", current)
         LOGGER.debug("Remote data last updated %s", self._vehicle.last_remote_update)
 
         assert last_good.vin
