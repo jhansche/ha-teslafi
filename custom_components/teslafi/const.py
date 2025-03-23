@@ -49,3 +49,9 @@ VIN_YEARS = {
     "S": 2025,
     "T": 2026,
 }
+
+IS_CLIMATE_ON_STATES = {
+    "1": False,
+    "2": True,
+    "None": None,
+}

@@ -10,7 +10,7 @@ from homeassistant.helpers.entity import ToggleEntity
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .base import TeslaFiEntity, TeslaFiSwitchEntityDescription
-from .const import DOMAIN, LOGGER
+from .const import DOMAIN, LOGGER, IS_CLIMATE_ON_STATES
 from .coordinator import TeslaFiCoordinator
 from .util import _convert_to_bool
 
@@ -20,7 +20,7 @@ SWITCHES = [
         name="Steering Wheel Heater",
         entity_registry_enabled_default=False,
         icon="mdi:steering",
-        available=lambda u, v, h: u and _convert_to_bool(v.get("is_climate_on")),
+        available=lambda u, v, h: u and IS_CLIMATE_ON_STATES.get(str(v.data.get("is_climate_on", "None")), None),
         cmd=lambda c, v: c.execute_command("steering_wheel_heater", statement=v),
     ),
     TeslaFiSwitchEntityDescription(
