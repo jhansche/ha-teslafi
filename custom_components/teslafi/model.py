@@ -30,11 +30,6 @@ CHARGER_CONNECTED_STATES = [
     "stopped",
 ]
 
-# Fields that should be updated even if the incoming data is empty
-UPDATE_NOT_EMPTY_IGNORE = [
-    "is_climate_on",
-]
-
 
 @dataclass
 class TeslaFiTirePressure:
@@ -67,7 +62,7 @@ class TeslaFiVehicle(UserDict):
             # Start out with all fields
             super().update(data)
         else:
-            filtered = {k: v for (k, v) in data.items() if (v or k in UPDATE_NOT_EMPTY_IGNORE)}
+            filtered = {k: v for (k, v) in data.items() if v}
             super().update(filtered)
 
     @property
@@ -246,7 +241,15 @@ class TeslaFiVehicle(UserDict):
         return (
             self.get("is_front_defroster_on") == "1"
             or self.get("is_rear_defroster_on") == "1"
-            or (self.get("defrost_mode", "0") != "0" and None != self.get("defrost_mode", "0"))
+            or ((d := self.get("defrost_mode", "0")) != "0" and d)
+        )
+        
+    @property
+    def is_climate_on(self) -> bool | None:
+        """Whether the climate control is on."""
+        return (
+            not self.is_sleeping
+            and self.get("is_climate_on") == "2" 
         )
 
     @property

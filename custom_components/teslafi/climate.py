@@ -21,7 +21,7 @@ from .base import (
     TeslaFiClimateEntityDescription,
     TeslaFiEntity,
 )
-from .const import DELAY_CLIMATE, DELAY_WAKEUP, DOMAIN, LOGGER, IS_CLIMATE_ON_STATES
+from .const import DELAY_CLIMATE, DELAY_WAKEUP, DOMAIN, LOGGER
 from .util import _convert_to_bool
 
 CLIMATES = [
@@ -87,7 +87,7 @@ class TeslaFiClimate(TeslaFiEntity[TeslaFiClimateEntityDescription], ClimateEnti
             float(temp) if (temp := self.coordinator.data.get("inside_temp")) else None
         )
 
-        is_on = IS_CLIMATE_ON_STATES.get(str(self.coordinator.data.get("is_climate_on", "None")), None)
+        is_on = self.coordinator.data.is_climate_on
 
         new_mode = None if is_on is None else HVACMode.AUTO if is_on else HVACMode.OFF
         want_mode = self._pending_mode
@@ -206,13 +206,12 @@ class TeslaFiClimate(TeslaFiEntity[TeslaFiClimateEntityDescription], ClimateEnti
             # So if the TeslaFi API reports F is preferred,
             # we have to convert it before sending.
             
-            # Note: As of 2025-03-22 it is not respecting the user's preferred units
-            # if self.coordinator.data.get("temperature", "C") == "F":
-            #     temperature = TemperatureConverter.convert(
-            #         temperature,
-            #         from_unit=UnitOfTemperature.CELSIUS,
-            #         to_unit=UnitOfTemperature.FAHRENHEIT,
-            #     )
+            if self.coordinator.data.get("temperature", "C") == "F":
+                temperature = TemperatureConverter.convert(
+                    temperature,
+                    from_unit=UnitOfTemperature.CELSIUS,
+                    to_unit=UnitOfTemperature.FAHRENHEIT,
+                )
             await self.coordinator.execute_command("set_temps", temp=temperature)
             self.async_write_ha_state()
             self._refresh_soon()
