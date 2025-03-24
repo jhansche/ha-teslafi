@@ -205,7 +205,6 @@ class TeslaFiClimate(TeslaFiEntity[TeslaFiClimateEntityDescription], ClimateEnti
             # but we originally reported it in C
             # So if the TeslaFi API reports F is preferred,
             # we have to convert it before sending.
-            
             if self.coordinator.data.get("temperature", "C") == "F":
                 temperature = TemperatureConverter.convert(
                     temperature,
