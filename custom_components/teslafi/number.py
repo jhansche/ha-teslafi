@@ -18,7 +18,7 @@ NUMBERS = [
         native_unit_of_measurement=PERCENTAGE,
         min_value=0,
         max_value=100,
-        step=1,
+        native_step=1,
         max_value_key="charge_limit_soc_max",
         cmd=lambda c, v: c.execute_command("set_charge_limit", charge_limit_soc=v),
     ),
@@ -31,7 +31,7 @@ NUMBERS = [
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         native_min_value=1,
         native_max_value=None,
-        step=1,
+        native_step=1,
         value=lambda v, h: (
             int(x)
             if (x := v.get("charge_current_request", v.charger_current))
@@ -59,7 +59,8 @@ class TeslaFiNumber(
             )
         if not max_value:
             max_value = self.entity_description.max_value
-        self._attr_native_max_value = max_value or self._attr_native_value
+        if max_value: 
+            self._attr_native_max_value = max_value
         return super()._handle_coordinator_update()
 
     async def async_set_native_value(self, value: float) -> None:
