@@ -127,7 +127,7 @@ class TeslaFiCoordinator(DataUpdateCoordinator[TeslaFiVehicle]):
         prev: TeslaFiVehicle,
         current: TeslaFiVehicle,
     ):
-        if prev and current and (prev != current):
+        if prev and current and (prev != current) and not current.is_sleeping:
             if not prev.is_plugged_in and current.is_plugged_in:
                 LOGGER.info("Vehicle is newly plugged in: resetting charge session")
                 self._last_charge_reset = current.last_remote_update
