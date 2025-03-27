@@ -16,7 +16,7 @@ def _int_or_none(src: str | None) -> int | None:
 
 def _convert_to_bool(value: any) -> bool | None:
     """Convert the TeslaFi value to a boolean"""
-    if value is bool:
+    if isinstance(value, bool):
         return value
     if value is None:
         return None
