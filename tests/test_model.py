@@ -1,8 +1,7 @@
 """Test for Model class"""
 from datetime import datetime
-import pytest
 
-from custom_components.teslafi.const import SHIFTER_STATES, TESLAFI_DATE_FORMAT, VIN_YEARS
+from custom_components.teslafi.const import TESLAFI_DATE_FORMAT
 from custom_components.teslafi.model import (
     TeslaFiVehicle,
     TeslaFiTirePressure,
