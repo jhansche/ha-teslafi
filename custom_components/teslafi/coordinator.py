@@ -51,7 +51,11 @@ class TeslaFiCoordinator(DataUpdateCoordinator[TeslaFiVehicle]):
         if self.data.is_sleeping:
             kwargs["wake"] = DELAY_CMD_WAKE.seconds
 
-        return await self._client.command(cmd, **kwargs)
+        response = await self._client.command(cmd, **kwargs)
+        self._vehicle.update_non_empty(response.get("tesla_request_counter", {}))
+        self.async_set_updated_data(self._vehicle)
+
+        return response
 
     def schedule_refresh_in(self, delta: timedelta):
         """Attempt to schedule a refresh"""
