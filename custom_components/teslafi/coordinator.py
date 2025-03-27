@@ -88,15 +88,25 @@ class TeslaFiCoordinator(DataUpdateCoordinator[TeslaFiVehicle]):
 
     async def _refresh(self) -> TeslaFiVehicle:
         """Refresh"""
-        current = await self._client.last_good()
-        LOGGER.debug("Last good: %s", current)
-
+        was_sleeping = self._vehicle.is_sleeping
+        current = await self._client.current_data()
+        LOGGER.debug("Current: %s", current)
+        
         self._infer_charge_session(prev=self.data, current=current)
+        
+        if current.is_sleeping and not was_sleeping:
+            LOGGER.debug("Car is now sleeping, fetching last good data")
+            last_good = await self._client.last_good()
+            LOGGER.debug("Last good: %s", last_good)
+            # Populating last good data as current will have numerous empty fields when car is sleeping
+            self._vehicle.update_non_empty(last_good)
+            
+            assert last_good.vin
 
         self._vehicle.update_non_empty(current)
+
         LOGGER.debug("Remote data last updated %s", self._vehicle.last_remote_update)
 
-        assert current.vin
         assert self._vehicle.vin
 
         if (car_state := self._vehicle.car_state) == "sleeping":
@@ -121,7 +131,7 @@ class TeslaFiCoordinator(DataUpdateCoordinator[TeslaFiVehicle]):
         prev: TeslaFiVehicle,
         current: TeslaFiVehicle,
     ):
-        if prev and current and (prev != current):
+        if prev and current and (prev != current) and not current.is_sleeping:
             if not prev.is_plugged_in and current.is_plugged_in:
                 LOGGER.info("Vehicle is newly plugged in: resetting charge session")
                 self._last_charge_reset = current.last_remote_update
