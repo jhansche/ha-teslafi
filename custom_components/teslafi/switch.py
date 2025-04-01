@@ -20,7 +20,7 @@ SWITCHES = [
         name="Steering Wheel Heater",
         entity_registry_enabled_default=False,
         icon="mdi:steering",
-        available=lambda u, v, h: u and _convert_to_bool(v.get("is_climate_on")),
+        available=lambda u, v, h: u and v.is_climate_on,
         cmd=lambda c, v: c.execute_command("steering_wheel_heater", statement=v),
     ),
     TeslaFiSwitchEntityDescription(
