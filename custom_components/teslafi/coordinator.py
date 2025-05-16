@@ -126,7 +126,7 @@ class TeslaFiCoordinator(DataUpdateCoordinator[TeslaFiVehicle]):
             )
         else:
             self._override_next_refresh = None
-        
+
         return self._vehicle
 
     def _infer_charge_session(
