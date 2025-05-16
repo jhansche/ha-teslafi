@@ -104,6 +104,9 @@ class TeslaFiCoordinator(DataUpdateCoordinator[TeslaFiVehicle]):
             assert last_good.vin
 
         self._vehicle.update_non_empty(current)
+        # Refresh TeslaFi command counts
+        if (counts := current.get("tesla_request_counter", {})):
+            self._vehicle.update_non_empty(counts)
 
         LOGGER.debug("Remote data last updated %s", self._vehicle.last_remote_update)
 
