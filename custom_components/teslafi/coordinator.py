@@ -52,7 +52,7 @@ class TeslaFiCoordinator(DataUpdateCoordinator[TeslaFiVehicle]):
             kwargs["wake"] = DELAY_CMD_WAKE.seconds
 
         response = await self._client.command(cmd, **kwargs)
-        self._vehicle.update_non_empty(response.get("tesla_request_counter", {}))
+        self._vehicle.update_non_empty(response)
         self.async_set_updated_data(self._vehicle)
 
         return response
@@ -104,9 +104,6 @@ class TeslaFiCoordinator(DataUpdateCoordinator[TeslaFiVehicle]):
             assert last_good.vin
 
         self._vehicle.update_non_empty(current)
-        # Refresh TeslaFi command counts
-        if (counts := current.get("tesla_request_counter", {})):
-            self._vehicle.update_non_empty(counts)
 
         LOGGER.debug("Remote data last updated %s", self._vehicle.last_remote_update)
 

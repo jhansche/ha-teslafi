@@ -58,6 +58,8 @@ class TeslaFiVehicle(UserDict):
 
     def update_non_empty(self, data) -> None:
         """Update this object with non-empty data from `data`."""
+        if (api_request_counts := data.pop("tesla_request_counter", {})):
+            super().update(api_request_counts)
         if not self.data:
             # Start out with all fields
             super().update(data)
