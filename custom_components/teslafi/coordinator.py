@@ -123,7 +123,13 @@ class TeslaFiCoordinator(DataUpdateCoordinator[TeslaFiVehicle]):
             )
         else:
             self._override_next_refresh = None
-
+            
+        # Refresh TeslaFi command counts
+        command_counts = await self._client.request_counts()
+        LOGGER.debug("TeslaFi command counts: %s", command_counts)
+        if command_counts is not None and "commands" in command_counts:
+            self._vehicle.update_non_empty(command_counts)
+        
         return self._vehicle
 
     def _infer_charge_session(
