@@ -104,6 +104,9 @@ class TeslaFiCoordinator(DataUpdateCoordinator[TeslaFiVehicle]):
             assert last_good.vin
 
         self._vehicle.update_non_empty(current)
+        # Refresh TeslaFi command counts
+        if (counts := current.get("tesla_request_counter", {})):
+            self._vehicle.update_non_empty(counts)
 
         LOGGER.debug("Remote data last updated %s", self._vehicle.last_remote_update)
 
@@ -123,12 +126,6 @@ class TeslaFiCoordinator(DataUpdateCoordinator[TeslaFiVehicle]):
             )
         else:
             self._override_next_refresh = None
-            
-        # Refresh TeslaFi command counts
-        command_counts = await self._client.request_counts()
-        LOGGER.debug("TeslaFi command counts: %s", command_counts)
-        if command_counts is not None and "commands" in command_counts:
-            self._vehicle.update_non_empty(command_counts)
         
         return self._vehicle
 
