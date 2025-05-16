@@ -66,6 +66,29 @@ def test_TeslaFiVehicle_update_no_inital_data():
     assert vehicle.odometer == 12345.67
     assert vehicle.firmware_version == "2023.10.1"
     
+def test_TeslaFiVehicle_update_non_empty_with_api_request():
+    """Test TeslaFiVehicle class with API request data"""
+    vehicle_data = {
+        "vin": "5YJSA1CG3DFP14555",
+        "display_name": "Test Car",
+        "odometer": 12345.67,
+        "car_version": "2023.10.1"
+    }
+    vehicle = TeslaFiVehicle(vehicle_data)
+    
+    # Update with API request data
+    api_data = {
+        "tesla_request_counter": {
+            "wakes": 1,
+            "commands": 12
+        }
+    }
+    
+    vehicle.update_non_empty(api_data)
+    
+    assert vehicle.get('wakes', None) == 1
+    assert vehicle.get('commands', None) == 12
+    
 def test_TeslaFiVehicle_id():
     """Test TeslaFiVehicle class id property"""
     vehicle_data = {
