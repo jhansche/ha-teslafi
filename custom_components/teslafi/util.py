@@ -1,3 +1,5 @@
+_FALSEY_STRINGS = ["0", "false", "False"]
+
 def _is_state(src: str | None, expect: str) -> bool | None:
     return None if src is None else src == expect
 
@@ -23,6 +25,6 @@ def _convert_to_bool(value: any) -> bool | None:
     if not value:
         return False
     # Otherwise it might be a non-falsey string that is actually false
-    if value == "0":
+    if value in _FALSEY_STRINGS:
         return False
     return bool(value)

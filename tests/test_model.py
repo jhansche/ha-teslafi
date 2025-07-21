@@ -1,11 +1,12 @@
 """Test for Model class"""
 from datetime import datetime
 
-from custom_components.teslafi.const import TESLAFI_DATE_FORMAT
 from custom_components.teslafi.model import (
     TeslaFiVehicle,
     TeslaFiTirePressure,
 )
+
+_TEST_VIN = "5YJSA1CG3DFP00000"
 
 def test_TeslaFiVehicle_constructor():
     vehicle = TeslaFiVehicle({})
@@ -15,7 +16,7 @@ def test_TeslaFiVehicle_constructor():
 def test_TeslaFiVehicle_update_non_empty():
     """Test TeslaFiVehicle class"""
     vehicle_data = {
-        "vin": "5YJSA1CG3DFP14555",
+        "vin": _TEST_VIN,
         "display_name": "Test Car",
         "odometer": 12345.67,
         "car_version": "2023.10.1"
@@ -23,7 +24,7 @@ def test_TeslaFiVehicle_update_non_empty():
     
     vehicle = TeslaFiVehicle(vehicle_data)
     
-    assert vehicle.vin == "5YJSA1CG3DFP14555"
+    assert vehicle.vin == _TEST_VIN
     assert vehicle.name == "Test Car"
     assert vehicle.odometer == 12345.67
     assert vehicle.firmware_version == "2023.10.1"
@@ -31,7 +32,7 @@ def test_TeslaFiVehicle_update_non_empty():
 def test_TeslaFiVehicle_update_non_empty_with_empty_data():
     """Test TeslaFiVehicle class with empty data"""
     vehicle_data = {
-        "vin": "5YJSA1CG3DFP14555",
+        "vin": _TEST_VIN,
         "display_name": "Test Car",
         "odometer": 12345.67,
         "car_version": "2023.10.1"
@@ -42,7 +43,7 @@ def test_TeslaFiVehicle_update_non_empty_with_empty_data():
     # Update with empty data
     vehicle.update_non_empty({})
     
-    assert vehicle.vin == "5YJSA1CG3DFP14555"
+    assert vehicle.vin == _TEST_VIN
     assert vehicle.name == "Test Car"
     assert vehicle.odometer == 12345.67
     assert vehicle.firmware_version == "2023.10.1"
@@ -50,7 +51,7 @@ def test_TeslaFiVehicle_update_non_empty_with_empty_data():
 def test_TeslaFiVehicle_update_no_inital_data():
     """Test TeslaFiVehicle class with empty data"""
     vehicle_data = {
-        "vin": "5YJSA1CG3DFP14555",
+        "vin": _TEST_VIN,
         "display_name": "Test Car",
         "odometer": 12345.67,
         "car_version": "2023.10.1"
@@ -61,7 +62,7 @@ def test_TeslaFiVehicle_update_no_inital_data():
     # Update with empty data
     vehicle.update_non_empty(vehicle_data)
     
-    assert vehicle.vin == "5YJSA1CG3DFP14555"
+    assert vehicle.vin == _TEST_VIN
     assert vehicle.name == "Test Car"
     assert vehicle.odometer == 12345.67
     assert vehicle.firmware_version == "2023.10.1"
@@ -69,7 +70,7 @@ def test_TeslaFiVehicle_update_no_inital_data():
 def test_TeslaFiVehicle_update_non_empty_with_api_request():
     """Test TeslaFiVehicle class with API request data"""
     vehicle_data = {
-        "vin": "5YJSA1CG3DFP14555",
+        "vin": _TEST_VIN,
         "display_name": "Test Car",
         "odometer": 12345.67,
         "car_version": "2023.10.1"
@@ -93,7 +94,7 @@ def test_TeslaFiVehicle_id():
     """Test TeslaFiVehicle class id property"""
     vehicle_data = {
         "id": "123.324 324",
-        "vin": "5YJSA1CG3DFP14555",
+        "vin": _TEST_VIN,
     }
     
     vehicle = TeslaFiVehicle(vehicle_data)
@@ -103,18 +104,18 @@ def test_TeslaFiVehicle_id():
 def test_TeslaFiVehicle_id_use_vin():
     """Test TeslaFiVehicle class id property"""
     vehicle_data = {
-        "vin": "5YJSA1CG3DFP14555",
+        "vin": _TEST_VIN,
     }
     
     vehicle = TeslaFiVehicle(vehicle_data)
     
-    assert vehicle.id == "5YJSA1CG3DFP14555"
+    assert vehicle.id == _TEST_VIN
 
 def test_TeslaFiVehicle_vehicle_id():
     """Test TeslaFiVehicle class id property"""
     vehicle_data = {
         "vehicle_id": "FOO_VEHICLE_ID",
-        "vin": "5YJSA1CG3DFP14555",
+        "vin": _TEST_VIN,
     }
     
     vehicle = TeslaFiVehicle(vehicle_data)
@@ -124,12 +125,12 @@ def test_TeslaFiVehicle_vehicle_id():
 def test_TeslaFiVehicle_vehicle_id_use_vin():
     """Test TeslaFiVehicle class id property"""
     vehicle_data = {
-        "vin": "5YJSA1CG3DFP14555"
+        "vin": _TEST_VIN
     }
     
     vehicle = TeslaFiVehicle(vehicle_data)
     
-    assert vehicle.vehicle_id == "5YJSA1CG3DFP14555"
+    assert vehicle.vehicle_id == _TEST_VIN
 
 def test_TeslaFiVehicle_firmware_version():
     """Test TeslaFiVehicle class id property"""
@@ -163,13 +164,13 @@ def test_TeslaFiVehicle_name():
 def test_TeslaFiVehicle_name_none():
     """Test TeslaFiVehicle class name property"""
     vehicle_data = {
-        "vin": "5YJSA1CG3DFP14555",
+        "vin": _TEST_VIN,
         "display_name": None
     }
     
     vehicle = TeslaFiVehicle(vehicle_data)
     
-    assert vehicle.name == "2013 modelS 4555"
+    assert vehicle.name == "2013 modelS 0000"
     
 def test_TeslaFiVehicle_last_remote_update():
     """Test TeslaFiVehicle class last_remote_update property"""
@@ -179,7 +180,7 @@ def test_TeslaFiVehicle_last_remote_update():
     
     vehicle = TeslaFiVehicle(vehicle_data)
     
-    assert vehicle.last_remote_update == datetime.strptime("2023-10-01 12:00:00", TESLAFI_DATE_FORMAT)
+    assert vehicle.last_remote_update == datetime(2023, 10, 1, 12, 0, 0)
 
 def test_TeslaFiVehicle_last_remote_update_none():
     """Test TeslaFiVehicle class last_remote_update property"""
@@ -211,7 +212,7 @@ def test_TeslaFiVehicle_car_type():
 def test_TeslaFiVehicle_car_type_from_vin():
     """Test TeslaFiVehicle class car_type property"""
     vehicle_data = {
-        "car_type": "modelS"
+        "vin": _TEST_VIN
     }
     
     vehicle = TeslaFiVehicle(vehicle_data)
@@ -231,12 +232,12 @@ def test_TeslaFiVehicle_car_type_none():
 def test_TeslaFiVehicle_vin():
     """Test TeslaFiVehicle class vin property"""
     vehicle_data = {
-        "vin": "5YJSA1CG3DFP14555"
+        "vin": _TEST_VIN
     }
     
     vehicle = TeslaFiVehicle(vehicle_data)
     
-    assert vehicle.vin == "5YJSA1CG3DFP14555"
+    assert vehicle.vin == _TEST_VIN
     
 def test_TeslaFiVehicle_car_state():
     """Test TeslaFiVehicle class car_state property"""
@@ -259,7 +260,7 @@ def test_TeslaFiVehicle_car_state_none():
     
 def test_TeslaFiVehicle_model_year():
     vehicle_data = {
-        "vin": "5YJSA1CG3DFP14555"
+        "vin": _TEST_VIN
     }
     
     vehicle = TeslaFiVehicle(vehicle_data)
@@ -554,7 +555,7 @@ def test_TeslaFiVehicle_is_defrosting_front():
 def test_TeslaFiVehicle_is_defrosting_rear():
     """Test TeslaFiVehicle class is_defrosting property"""
     vehicle_data = {
-        "is_front_defroster_on": "1"
+        "is_rear_defroster_on": "1"
     }
     
     vehicle = TeslaFiVehicle(vehicle_data)
@@ -616,19 +617,6 @@ def test_TeslaFiVehicle_tpms_none():
     assert vehicle.tpms.rear_left is None
     assert vehicle.tpms.rear_right is None
     assert vehicle.tpms.unit == "psi"
-
-def test_TeslaFiTirePressure_constructor():
-    """Test TeslaFiTirePressure class"""
-    
-    tire_pressure = TeslaFiTirePressure(
-        front_left=43.0,
-        front_right=42.5,
-        rear_left=41.5,
-        rear_right=44.0,
-        unit="psi",
-    )
-    
-    assert isinstance(tire_pressure, TeslaFiTirePressure)
     
 def test_TeslaFiTirePressure_convert_unit():
     """Test TeslaFiTirePressure class convert_unit method"""

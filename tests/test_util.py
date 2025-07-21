@@ -47,7 +47,5 @@ def test_convert_to_bool():
     assert _convert_to_bool("1") is True
     assert _convert_to_bool("test") is True
     assert _convert_to_bool("") is False
-    
-    # TODO: Do we want this scenarios to actually eval as true?
-    assert _convert_to_bool("False") is True
-    assert _convert_to_bool("false") is True
+    assert _convert_to_bool("False") is False
+    assert _convert_to_bool("false") is False
